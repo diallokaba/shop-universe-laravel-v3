@@ -1,0 +1,1076 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Manager API for ShopManagement",
+        "version": "1.0.0"
+    },
+    "paths": {
+        "/api/v1/articles/{id}": {
+            "patch": {
+                "tags": [
+                    "UpdateArticleStockById"
+                ],
+                "summary": "Update article stock by id",
+                "description": "Mettre à jour la quantité en stock d'un article par son id",
+                "operationId": "UpdateArticleStockById",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "L'id de l'article à mettre à jour",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 5
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "qteStock"
+                                ],
+                                "properties": {
+                                    "qteStock": {
+                                        "type": "integer",
+                                        "example": "3"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        },
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "qteStock"
+                                ],
+                                "properties": {
+                                    "qteStock": {
+                                        "type": "integer",
+                                        "example": "3"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Quantité en stock mise à jour avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "404": {
+                        "description": "Resource Not Found"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/register": {
+            "post": {
+                "tags": [
+                    "Register"
+                ],
+                "summary": "User Register",
+                "description": "Création de compte pour un client",
+                "operationId": "Register",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "nom",
+                                    "prenom",
+                                    "photo",
+                                    "login",
+                                    "password",
+                                    "password_confirmation",
+                                    "client"
+                                ],
+                                "properties": {
+                                    "nom": {
+                                        "type": "string",
+                                        "example": "John"
+                                    },
+                                    "prenom": {
+                                        "type": "string",
+                                        "example": "Doe"
+                                    },
+                                    "photo": {
+                                        "type": "string",
+                                        "example": "https://images.pexels.com/photos/633432/pexels-photo-633432.jpeg?auto=compress&cs=tinysrgb&w=600"
+                                    },
+                                    "login": {
+                                        "type": "string",
+                                        "example": "johndoe"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "Passer@123"
+                                    },
+                                    "password_confirmation": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "Passer@123"
+                                    },
+                                    "client": {
+                                        "properties": {
+                                            "id": {
+                                                "type": "integer",
+                                                "example": "1"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        },
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "nom",
+                                    "prenom",
+                                    "photo",
+                                    "login",
+                                    "password",
+                                    "password_confirmation",
+                                    "client"
+                                ],
+                                "properties": {
+                                    "nom": {
+                                        "type": "string",
+                                        "example": "John"
+                                    },
+                                    "prenom": {
+                                        "type": "string",
+                                        "example": "Doe"
+                                    },
+                                    "photo": {
+                                        "type": "string",
+                                        "example": "https://images.pexels.com/photos/633432/pexels-photo-633432.jpeg?auto=compress&cs=tinysrgb&w=600"
+                                    },
+                                    "login": {
+                                        "type": "string",
+                                        "example": "johndoe"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "Passer@123"
+                                    },
+                                    "password_confirmation": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "Passer@123"
+                                    },
+                                    "client": {
+                                        "properties": {
+                                            "id": {
+                                                "type": "integer",
+                                                "example": "1"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Compte créer avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "404": {
+                        "description": "Resource Not Found"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                }
+            }
+        },
+        "/api/v1/login": {
+            "post": {
+                "tags": [
+                    "Login"
+                ],
+                "summary": "User Login",
+                "description": "Connexion de l'utilisateur...",
+                "operationId": "Login",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "login",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "login": {
+                                        "type": "string",
+                                        "example": "khalilThree"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "example": "Passer@123"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        },
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "login",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "login": {
+                                        "type": "string",
+                                        "example": "khalilThree"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "example": "Passer@123"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Connexion réussie",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "404": {
+                        "description": "Resource Not Found"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                }
+            }
+        },
+        "/api/v1/profile": {
+            "get": {
+                "tags": [
+                    "Profile"
+                ],
+                "summary": "Get user profile",
+                "description": "Récuperer les informations de l'utilisateur connecté.",
+                "operationId": "getProfile",
+                "responses": {
+                    "200": {
+                        "description": "Opération réussie",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/logout": {
+            "get": {
+                "tags": [
+                    "Logout"
+                ],
+                "summary": "Logout user",
+                "description": "Déconnexion de l'utilisateur de l'application.",
+                "operationId": "Logout",
+                "responses": {
+                    "200": {
+                        "description": "Opération réussie",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/clients": {
+            "get": {
+                "tags": [
+                    "AllClientsWithOptionalFilters"
+                ],
+                "summary": "Get all Clients with optional filters",
+                "description": "Récupération de tous les clients avec possibilité de filtrer les clients qui ont des comptes, qui n'ont pas de compte. Ceux dont leurs compte est actif ou inactif",
+                "operationId": "GetAllClientsWithOptionalFilters",
+                "parameters": [
+                    {
+                        "name": "comptes",
+                        "in": "query",
+                        "description": "Filterer les clients par comptes (oui ou non)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "oui",
+                                "non"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "active",
+                        "in": "query",
+                        "description": "Filterer les clients par etat (oui ou non)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "oui",
+                                "non"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Opération reussie",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "404": {
+                        "description": "Resource Not Found"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "StoreClient"
+                ],
+                "summary": "Store Client",
+                "description": "Création d'un client avec la possibilité de lui créer un compte",
+                "operationId": "StoreClient",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "surname",
+                                    "telephone"
+                                ],
+                                "properties": {
+                                    "surname": {
+                                        "type": "string",
+                                        "example": "bobou"
+                                    },
+                                    "telephone": {
+                                        "type": "string",
+                                        "example": "761434522"
+                                    },
+                                    "adresse": {
+                                        "type": "string",
+                                        "example": "namek"
+                                    },
+                                    "user": {
+                                        "properties": {
+                                            "nom": {
+                                                "type": "string",
+                                                "example": "Mahmoud"
+                                            },
+                                            "prenom": {
+                                                "type": "string",
+                                                "example": "Mahmoud"
+                                            },
+                                            "login": {
+                                                "type": "string",
+                                                "example": "Mahmoudine"
+                                            },
+                                            "photo": {
+                                                "type": "string",
+                                                "example": "https://images.pexels.com/photos/633432/pexels-photo-633432.jpeg?auto=compress&cs=tinysrgb&w=600"
+                                            },
+                                            "password": {
+                                                "type": "string",
+                                                "format": "password",
+                                                "example": "Passer@123"
+                                            },
+                                            "password_confirmation": {
+                                                "type": "string",
+                                                "format": "password",
+                                                "example": "Passer@123"
+                                            },
+                                            "role": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": "3"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        },
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "surname",
+                                    "telephone"
+                                ],
+                                "properties": {
+                                    "surname": {
+                                        "type": "string",
+                                        "example": "bobou"
+                                    },
+                                    "telephone": {
+                                        "type": "string",
+                                        "example": "761434522"
+                                    },
+                                    "adresse": {
+                                        "type": "string",
+                                        "example": "namek"
+                                    },
+                                    "user": {
+                                        "properties": {
+                                            "nom": {
+                                                "type": "string",
+                                                "example": "Mahmoud"
+                                            },
+                                            "prenom": {
+                                                "type": "string",
+                                                "example": "Mahmoud"
+                                            },
+                                            "login": {
+                                                "type": "string",
+                                                "example": "Mahmoudine"
+                                            },
+                                            "photo": {
+                                                "type": "string",
+                                                "example": "https://images.pexels.com/photos/633432/pexels-photo-633432.jpeg?auto=compress&cs=tinysrgb&w=600"
+                                            },
+                                            "password": {
+                                                "type": "string",
+                                                "format": "password",
+                                                "example": "Passer@123"
+                                            },
+                                            "password_confirmation": {
+                                                "type": "string",
+                                                "format": "password",
+                                                "example": "Passer@123"
+                                            },
+                                            "role": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": "3"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Client créé avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "404": {
+                        "description": "Resource Not Found"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/clients/telephone": {
+            "post": {
+                "tags": [
+                    "SearchClientByTelephone"
+                ],
+                "summary": "Search Client By Telephone",
+                "description": "Récupérer le client par son telephone",
+                "operationId": "SearchClientByTelephone",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "telephone"
+                                ],
+                                "properties": {
+                                    "telephone": {
+                                        "type": "string",
+                                        "example": "785222794"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        },
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "telephone"
+                                ],
+                                "properties": {
+                                    "telephone": {
+                                        "type": "string",
+                                        "example": "761434522"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Opération réussie",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "404": {
+                        "description": "Resource Not Found"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/clients/{id}": {
+            "get": {
+                "tags": [
+                    "GetClientById"
+                ],
+                "summary": "Get Client By ID",
+                "description": "Récupération du client par son ID",
+                "operationId": "GetClientById",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Récupérer le client par son ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 17
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Opération reussie",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "404": {
+                        "description": "Resource Not Found"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/clients/{id}/user": {
+            "get": {
+                "tags": [
+                    "GetClientByIdWithUserAccount"
+                ],
+                "summary": "Get Client By ID with User Account",
+                "description": "Récupération du client par son ID et son compte utilisateur",
+                "operationId": "GetClientByIdWithUserAccount",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Récupérer le client par son ID et son compte utilisateur",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 17
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Opération reussie",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "404": {
+                        "description": "Resource Not Found"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/users": {
+            "get": {
+                "tags": [
+                    "AllUsersWithOptionalFilters"
+                ],
+                "summary": "Get all users with optional filters",
+                "description": "Récupération des utilisateurs avec possibilité de filtrer par role et/ou par active",
+                "operationId": "GetAllUsersWithOptionalFilters",
+                "parameters": [
+                    {
+                        "name": "role",
+                        "in": "query",
+                        "description": "Filterer les utilisateurs par role (admin ou boutiquier)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "admin",
+                                "boutiquier"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "active",
+                        "in": "query",
+                        "description": "Filterer les utilisateurs par status (oui ou non)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "oui",
+                                "non"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Opération reussie",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "404": {
+                        "description": "Resource Not Found"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "StoreUser"
+                ],
+                "summary": "Store User",
+                "description": "Creation d'un compte utilisateur avec le role ADMIN ou BOUTIQUIER",
+                "operationId": "StoreUser",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "nom",
+                                    "prenom",
+                                    "photo",
+                                    "login",
+                                    "password",
+                                    "password_confirmation",
+                                    "role"
+                                ],
+                                "properties": {
+                                    "nom": {
+                                        "type": "string",
+                                        "example": "John"
+                                    },
+                                    "prenom": {
+                                        "type": "string",
+                                        "example": "Doe"
+                                    },
+                                    "photo": {
+                                        "type": "string",
+                                        "example": "https://images.pexels.com/photos/633432/pexels-photo-633432.jpeg?auto=compress&cs=tinysrgb&w=600"
+                                    },
+                                    "login": {
+                                        "type": "string",
+                                        "example": "johndoe"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "Passer@123"
+                                    },
+                                    "password_confirmation": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "Passer@123"
+                                    },
+                                    "role": {
+                                        "properties": {
+                                            "id": {
+                                                "type": "integer",
+                                                "example": "1"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        },
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "nom",
+                                    "prenom",
+                                    "photo",
+                                    "login",
+                                    "password",
+                                    "password_confirmation",
+                                    "role"
+                                ],
+                                "properties": {
+                                    "nom": {
+                                        "type": "string",
+                                        "example": "John"
+                                    },
+                                    "prenom": {
+                                        "type": "string",
+                                        "example": "Doe"
+                                    },
+                                    "photo": {
+                                        "type": "string",
+                                        "example": "https://images.pexels.com/photos/633432/pexels-photo-633432.jpeg?auto=compress&cs=tinysrgb&w=600"
+                                    },
+                                    "login": {
+                                        "type": "string",
+                                        "example": "johndoe"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "Passer@123"
+                                    },
+                                    "password_confirmation": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "Passer@123"
+                                    },
+                                    "role": {
+                                        "properties": {
+                                            "id": {
+                                                "type": "integer",
+                                                "example": "1"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Compte utilisateur créé avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "404": {
+                        "description": "Resource Not Found"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "bearerFormat": "JWT",
+                "scheme": "bearer"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "UpdateArticleStockById",
+            "description": "UpdateArticleStockById"
+        },
+        {
+            "name": "Register",
+            "description": "Register"
+        },
+        {
+            "name": "Login",
+            "description": "Login"
+        },
+        {
+            "name": "Profile",
+            "description": "Profile"
+        },
+        {
+            "name": "Logout",
+            "description": "Logout"
+        },
+        {
+            "name": "StoreClient",
+            "description": "StoreClient"
+        },
+        {
+            "name": "AllClientsWithOptionalFilters",
+            "description": "AllClientsWithOptionalFilters"
+        },
+        {
+            "name": "SearchClientByTelephone",
+            "description": "SearchClientByTelephone"
+        },
+        {
+            "name": "GetClientById",
+            "description": "GetClientById"
+        },
+        {
+            "name": "GetClientByIdWithUserAccount",
+            "description": "GetClientByIdWithUserAccount"
+        },
+        {
+            "name": "StoreUser",
+            "description": "StoreUser"
+        },
+        {
+            "name": "AllUsersWithOptionalFilters",
+            "description": "AllUsersWithOptionalFilters"
+        }
+    ]
+}
