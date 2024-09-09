@@ -18,6 +18,8 @@ use App\Observers\UserObserver;
 use App\Observers\ClientObserver;
 use App\Models\User;
 use App\Models\Client;
+use App\Repositories\DetteRepositoryImpl;
+use App\Repositories\DetteRepositoryInterface;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -28,6 +30,7 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->app->singleton(ArticleRepositoryInterface::class, ArticleRepositoryImpl::class);
         $this->app->singleton(ArticleServiceInterface::class, ArticleServiceImpl::class);
+        $this->app->singleton(DetteRepositoryInterface::class, DetteRepositoryImpl::class);
         $this->app->singleton('clientRepository', function () {
             return new ClientRepositoryImpl();
         });

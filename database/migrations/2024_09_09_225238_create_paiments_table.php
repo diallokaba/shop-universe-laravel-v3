@@ -11,11 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('dettes', function (Blueprint $table) {
+        Schema::create('paiments', function (Blueprint $table) {
             $table->id();
             $table->integer('montant');
-            $table->unsignedBigInteger('client_id');
-            $table->foreign('client_id')->references('id')->on('clients')->onDelete('cascade');
+            $table->unsignedBigInteger('dette_id');
+            $table->foreign('dette_id')->references('id')->on('dettes')->onDelete('cascade');
             $table->timestamps();
         });
     }
@@ -25,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('dettes');
+        Schema::dropIfExists('paiments');
     }
 };
