@@ -17,12 +17,12 @@ class ClientEvent
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public Client $client;
-    public User $user;
+    public $user;
 
     /**
      * Create a new event instance.
      */
-    public function __construct(Client $client, User $user)
+    public function __construct(Client $client, $user)
     {
         $this->client = $client;
         $this->user = $user;

@@ -134,11 +134,10 @@ class ClientController extends Controller
         $client = clientService::create($clientRequest);
         return $client;
         //return $this->sendResponse(new ClientResource($client), StatusResponseEnum::SUCCESS, 'Client créé avec succès', 201);
-        
     }
 
     public function all(){
-        return $this->sendResponse(clientService::all(), StatusResponseEnum::SUCCESS, 'Tous les clients');
+        return clientService::all();
     }
 
    /**

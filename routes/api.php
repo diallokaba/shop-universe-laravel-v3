@@ -3,6 +3,7 @@
 use App\Http\Controllers\ArticleController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ClientController;
+use App\Http\Controllers\DetteController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -36,6 +37,10 @@ Route::group([
     Route::get('/articles/{id}', [ArticleController::class, 'getArticleById']);
     Route::post('/articles/libelle', [ArticleController::class, 'getArticleByLibelle']);
     Route::post('/articles', [ArticleController::class, 'store']);
+
+    Route::post('/dettes', [DetteController::class, 'store']);
+    Route::get('/dettes', [DetteController::class, 'index']);
+    Route::post('/dettes/{id}/paiments', [DetteController::class, 'paiement']);
 });
 
 //protected route only ADMIN can access

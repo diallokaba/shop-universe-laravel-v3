@@ -44,7 +44,7 @@ class ArticleRequest extends FormRequest
             'reference.max' => 'La référence doit faire maximum 255 caractères.',
             'prix.required' => 'Le prix est obligatoire.',
             'prix.numeric' => 'Le prix doit être un nombre valide.',
-            'prix.min' => 'La prix en stock doit être un nombre positif.',
+            'prix.min' => 'Le prix en stock doit être un nombre positif.',
             'quantite.required' => 'La quantité en stock est obligatoire.',
             'quantite.integer' => 'La quantité en stock doit être un nombre entier.',
             'quantite.min' => 'La quantité en stock doit être un nombre positif.',

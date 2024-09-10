@@ -33,18 +33,15 @@ class ClientServiceImpl implements ClientServiceInterface
 
     public function create(array $data){
 
-        return DB::transaction(function () use ($data) {
-        
-        
+        return DB::transaction(function () use ($data) {        
             return clientRepository::create([
                 'surname' => $data['surname'],
                 'telephone' => $data['telephone'],
                 'adresse' => $data['adresse'],
             ]);
         });
-        //DB::beginTransaction();
-        //return clientRepository::create($data);
     }
+
     /*public function create(array $data){
         try {
             DB::beginTransaction();

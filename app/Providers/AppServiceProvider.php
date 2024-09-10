@@ -9,6 +9,8 @@ use App\Repositories\ClientRepositoryImpl;
 use App\Services\ArticleServiceImpl;
 use App\Services\ArticleServiceInterface;
 use App\Services\ClientServiceImpl;
+use App\Services\DetteServiceImpl;
+use App\Services\DetteServiceInterface;
 use App\Services\ImgurService;
 use App\Services\UploadService;
 use App\Services\UploadServiceImgur;
@@ -31,6 +33,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(ArticleRepositoryInterface::class, ArticleRepositoryImpl::class);
         $this->app->singleton(ArticleServiceInterface::class, ArticleServiceImpl::class);
         $this->app->singleton(DetteRepositoryInterface::class, DetteRepositoryImpl::class);
+        $this->app->singleton(DetteServiceInterface::class, DetteServiceImpl::class);
         $this->app->singleton('clientRepository', function () {
             return new ClientRepositoryImpl();
         });

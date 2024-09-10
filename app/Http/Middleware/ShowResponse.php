@@ -20,11 +20,13 @@ class ShowResponse
         if ($response instanceof Response && $response->headers->get('Content-Type') === 'application/json') {
             $data = json_decode($response->getContent(), true);
 
-            if ($response->isSuccessful()) {
-                $data['message'] = 'Opération réussie';
-            }
+            if (json_last_error() === JSON_ERROR_NONE) {
+                if ($response->isSuccessful()) {
+                    $data['message'] = 'Opération réussie';
+                }
 
-            $response->setContent(json_encode($data));
+                $response->setContent(json_encode($data));
+            }
         }
 
         return $response;

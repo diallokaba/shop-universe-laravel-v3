@@ -26,7 +26,7 @@ class UploadPhotoJob implements ShouldQueue
     /**
      * Create a new job instance.
      */
-    public function __construct(User $user, Client $client)
+    public function __construct($user, Client $client)
     {
         $this->user = $user;
         $this->client = $client;

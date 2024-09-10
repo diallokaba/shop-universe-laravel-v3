@@ -28,7 +28,7 @@ class SendMailJob implements ShouldQueue
     /**
      * Create a new job instance.
      */
-    public function __construct(User $user, Client $client)
+    public function __construct($user, Client $client)
     {
         $this->user = $user;
         $this->client = $client;
@@ -57,58 +57,57 @@ class SendMailJob implements ShouldQueue
         Mail::to( $this->user->login)->send(new SendMailAttachment($this->user, $pdfPath));*/
 
 
+        if(isset($this->user)){
+            $qrCodeContent = 'telephone: ' . $this->client->telephone;
+            $qrCode = Builder::create()
+            ->writer(new PngWriter())
+            ->data($qrCodeContent)
+            ->encoding(new Encoding('UTF-8'))
+            ->size(300)
+            ->build();
+
+            $qrcodePath = storage_path('app/temp/qrcode_' . uniqid() . '.png');
+            $qrCode->saveToFile($qrcodePath);
+
+            
+            // Chemin pour enregistrer le QR code temporaire
+            $tempDir = storage_path('app/temp'); // Utilisation de storage_path() pour obtenir le chemin absolu
+            $qrTempPath = $tempDir . '/qrcode_' . uniqid() . '.png';
+
+            // Vérifiez si le répertoire existe, sinon créez-le
+            if (!file_exists($tempDir)) {
+                mkdir($tempDir, 0777, true); // Créez le répertoire s'il n'existe pas
+            }
+
+            // Enregistrer le QR code temporaire
+            file_put_contents($qrTempPath, $qrCode->getString()); // Utilisation de file_put_contents() pour écrire le fichier
+
+            // Télécharger l'image sur Imgur
+
+            $imgurUrl = UploadServiceImgur::uploadImageWithImgur($qrTempPath);
+            $this->client->qrcode = $imgurUrl;
+            $this->client->save();
+            // Générer la carte de fidélité en PDF 
+            $pdf = Pdf::loadView('fidelity_card', [
+                'pseudo' => $this->user->nom . ' ' .  $this->user->prenom,
+                'email' => $this->user->login,
+                'qrCodeImageUrl' => $qrTempPath,
+            ]);
+
+            // Définir le chemin temporaire du PDF
+            $tempDir = storage_path('app/temp');
+            if (!file_exists($tempDir)) {
+                mkdir($tempDir, 0777, true); // Créez le répertoire s'il n'existe pas
+            }
+
+            // Sauvegarde temporaire du PDF
+            $pdfPath = $tempDir . '/fidelite_card_' . uniqid() . '.pdf';
+            $pdf->save($pdfPath);
+
+
+            Mail::to($this->user->login)->send(new SendMailAttachment($this->client, $this->user, $pdfPath));
+        }
         
-
-
-        //info stocker dans le qrcode 
-        $qrCodeContent = 'telephone: ' . $this->client->telephone;
-        $qrCode = Builder::create()
-        ->writer(new PngWriter())
-        ->data($qrCodeContent)
-        ->encoding(new Encoding('UTF-8'))
-        ->size(300)
-        ->build();
-
-        $qrcodePath = storage_path('app/temp/qrcode_' . uniqid() . '.png');
-        $qrCode->saveToFile($qrcodePath);
-
-      
-       // Chemin pour enregistrer le QR code temporaire
-       $tempDir = storage_path('app/temp'); // Utilisation de storage_path() pour obtenir le chemin absolu
-       $qrTempPath = $tempDir . '/qrcode_' . uniqid() . '.png';
-
-       // Vérifiez si le répertoire existe, sinon créez-le
-       if (!file_exists($tempDir)) {
-           mkdir($tempDir, 0777, true); // Créez le répertoire s'il n'existe pas
-       }
-
-       // Enregistrer le QR code temporaire
-       file_put_contents($qrTempPath, $qrCode->getString()); // Utilisation de file_put_contents() pour écrire le fichier
-
-       // Télécharger l'image sur Imgur
-
-        $imgurUrl = UploadServiceImgur::uploadImageWithImgur($qrTempPath);
-        $this->client->qrcode = $imgurUrl;
-        $this->client->save();
-        // Générer la carte de fidélité en PDF 
-       $pdf = Pdf::loadView('fidelity_card', [
-           'pseudo' => $this->user->nom . ' ' .  $this->user->prenom,
-           'email' => $this->user->login,
-           'qrCodeImageUrl' => $qrTempPath,
-       ]);
-
-       // Définir le chemin temporaire du PDF
-       $tempDir = storage_path('app/temp');
-       if (!file_exists($tempDir)) {
-           mkdir($tempDir, 0777, true); // Créez le répertoire s'il n'existe pas
-       }
-
-       // Sauvegarde temporaire du PDF
-       $pdfPath = $tempDir . '/fidelite_card_' . uniqid() . '.pdf';
-       $pdf->save($pdfPath);
-
-
-       Mail::to($this->user->login)->send(new SendMailAttachment($this->client, $this->user, $pdfPath));
 
     }
 }

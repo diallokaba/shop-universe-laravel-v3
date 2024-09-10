@@ -8,12 +8,12 @@ class DetteRepositoryImpl implements DetteRepositoryInterface
 {
     public function all()
     {
-        // TODO: Implement all() method.
+        return Dette::all();
     }
 
     public function create(array $data)
     {
-        Dette::create($data);
+        return Dette::create($data);
     }
 
     public function update(array $data, $id)
@@ -24,5 +24,19 @@ class DetteRepositoryImpl implements DetteRepositoryInterface
     public function delete($id)
     {
         // TODO: Implement delete() method.
+    }
+
+    public function find($id){
+        return Dette::find($id);
+    }
+
+    public function findOrFail($id)
+    {
+        // TODO: Implement find() method.
+        return Dette::findOrFail($id);
+    }
+
+    public function filter(){
+        return Dette::query();
     }
 }

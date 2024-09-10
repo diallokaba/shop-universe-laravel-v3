@@ -17,10 +17,16 @@ class ArticleRepositoryImpl implements ArticleRepositoryInterface
         return Article::create($articles);
     }
 
-    public function find($id)
+    public function findOrFail($id)
     {
         // TODO: Implement find() method.
         return Article::findOrFail($id);
+    }
+
+    public function find($id)
+    {
+        // TODO: Implement find() method.
+        return Article::find($id);
     }
 
     public function update($id, array $articles)

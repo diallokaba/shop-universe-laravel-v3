@@ -19,8 +19,9 @@ class ClientObserver
     public function created(Client $client): void
     {
         $data = request()->all();
-        //$clientRequest = $request->only('surname','adresse','telephone', 'user');
-        $roleId = $data['user']['role']['id'] ?? null;
+        $user = null;
+        if(isset($data['user'])) {
+            $roleId = $data['user']['role']['id'] ?? null;
         if (!$roleId) {
             throw new Exception('Le rôle de l\'utilisateur est manquant.');
         }
@@ -46,6 +47,8 @@ class ClientObserver
 
         $client->user_id = $user->id;
         $client->save();
+        }
+        
 
         event(new ClientEvent($client, $user));
     }
