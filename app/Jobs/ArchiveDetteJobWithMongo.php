@@ -10,6 +10,8 @@ use Illuminate\Queue\SerializesModels;
 use App\Facades\MongoClientFacade as MongoClient;
 use App\Models\Dette;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class ArchiveDetteJobWithMongo implements ShouldQueue
 {
@@ -28,28 +30,50 @@ class ArchiveDetteJobWithMongo implements ShouldQueue
      */
     public function handle(): void
     {
-        $mongoClient = MongoClient::getClient();
-        $db = $mongoClient->selectDatabase(env('MONGO_DATABASE')); // Sélectionner la base de données
-        $collection = $db->selectCollection('archives_' . Carbon::now()->format('Y_m_d')); // Sélectionner la collection du jour
-        
-        $dettes = Dette::with(['details_dette', 'paiements', 'client'])->where('statut', 'solde')->get();
+        // Démarrage de la transaction SQL
+        DB::beginTransaction();
 
-        foreach ($dettes as $dette) {
-            $data = [
-                'dette' => $dette->toArray(),
-                'details_dette' => $dette->details_dette->toArray(),
-                'paiements' => $dette->paiements->toArray(),
-                'client' => $dette->client->toArray(),
-                'archived_at' => now(),
-            ];
+        try {
+            $mongoClient = MongoClient::getClient();
+            $db = $mongoClient->selectDatabase(env('MONGO_DATABASE')); // Sélectionner la base de données
+            $collection = $db->selectCollection('archives_' . Carbon::now()->format('Y_m_d')); // Sélectionner la collection du jour
+            
+            $dettes = Dette::with(['paiements', 'client'])->where('statut', 'solde')->get();
 
-            $collection->insertOne($data);
+            foreach ($dettes as $dette) {
+                $data = [
+                    'dette' => $dette->toArray(),
+                    'details_dette' => $dette->getDetailsDette()->toArray(),
+                    'paiements' => $dette->paiements->toArray(),
+                    'client' => $dette->client->toArray(),
+                    'archived_at' => now(),
+                ];
 
-            $dette->details_dette()->delete();
-            $dette->paiements()->delete();
-            $dette->delete();
+                // Insertion dans MongoDB
+                $insertResult = $collection->insertOne($data);
+
+                // Vérification du succès de l'insertion
+                if ($insertResult->getInsertedCount() === 1) {
+                    // Supprimer les détails de la dette dans SQL
+                    DB::table('details_dette')->where('dette_id', $dette->id)->delete();
+                    $dette->paiements()->delete();
+                    $dette->delete();
+                } else {
+                    // Si l'insertion échoue, lancer une exception
+                    throw new \Exception('Échec de l\'insertion dans MongoDB');
+                }
+            }
+
+            // Validation de la transaction SQL
+            DB::commit();
+
+            echo "Les dettes soldées ont été archivées avec succès dans MongoDB.\n";
+
+        } catch (\Exception $e) {
+            // Annuler la transaction en cas d'erreur
+            DB::rollBack();
+            Log::error('Erreur lors de l\'archivage des dettes : ' . $e->getMessage());
+            echo "Erreur lors de l'archivage des dettes : " . $e->getMessage() . "\n";
         }
-
-        echo "Les dettes soldées ont été archivées avec succès dans MongoDB.\n";
     }
 }

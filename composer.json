@@ -11,6 +11,7 @@
         "endroid/qr-code": "^5.0",
         "guzzlehttp/guzzle": "^7.2",
         "infobip/infobip-api-php-client": "^5.0",
+        "kreait/firebase-php": "^7.15",
         "laravel/framework": "^10.10",
         "laravel/passport": "^12.3",
         "laravel/sanctum": "^3.3",

@@ -10,7 +10,7 @@ class MongoClientImpl implements MongoClientInterface{
 
     public function __construct(){
 
-        $this->client = new Client(env('MONGO_URI'));
+        $this->client = new Client(env('MONGO_URL'));
     }
     public function getClient()
     {

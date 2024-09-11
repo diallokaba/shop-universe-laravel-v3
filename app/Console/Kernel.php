@@ -23,10 +23,11 @@ class Kernel extends ConsoleKernel
         //$schedule->job(new SendSMSNotificationJob)->weeklyOn(5, '14:00');
         //$schedule->job(new SendSMSNotificationJob)->everyMinute();
         if($db_archive == 'mongodb') {
-            //$schedule->job(new ArchiveDetteJobWithMongo)->everyFiveSeconds();
-            $schedule->job(new ArchiveDetteJobWithMongo)->daily();
+            $schedule->job(new ArchiveDetteJobWithMongo)->everyFiveSeconds();
+            //$schedule->job(new ArchiveDetteJobWithMongo)->daily();
         }elseif($db_archive == 'firebase') {
-            $schedule->job(new ArchiveDetteJobWithFireBase)->daily();
+            $schedule->job(new ArchiveDetteJobWithFireBase)->everyFiveSeconds();
+            //$schedule->job(new ArchiveDetteJobWithFireBase)->daily();
         }
     }
 

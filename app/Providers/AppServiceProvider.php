@@ -24,6 +24,7 @@ use App\Models\User;
 use App\Models\Client;
 use App\Repositories\DetteRepositoryImpl;
 use App\Repositories\DetteRepositoryInterface;
+use App\Services\FirebaseService;
 use App\Services\MongoClientImpl;
 
 class AppServiceProvider extends ServiceProvider
@@ -55,6 +56,10 @@ class AppServiceProvider extends ServiceProvider
 
         $this->app->singleton('mongoClient', function () {
             return new MongoClientImpl();
+        });
+
+        $this->app->singleton('firebaseClient', function () {
+            return new FirebaseService();
         });
 
         /*$this->app->singleton('SendSMSWithInfoBip', function () {
