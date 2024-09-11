@@ -31,4 +31,9 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'infobip' => [
+        'base_url' => env('INFOBIP_BASE_URL'),
+        'api_key' => env('INFOBIP_API_KEY'),
+    ],
+
 ];

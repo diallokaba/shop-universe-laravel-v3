@@ -12,6 +12,7 @@ use App\Services\ClientServiceImpl;
 use App\Services\DetteServiceImpl;
 use App\Services\DetteServiceInterface;
 use App\Services\ImgurService;
+use App\Services\SendSMSWithInfoBip;
 use App\Services\UploadService;
 use App\Services\UploadServiceImgur;
 
@@ -48,6 +49,10 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton('uploadServiceImgur', function () {
             return new UploadServiceImgur();
         });
+
+        /*$this->app->singleton('SendSMSWithInfoBip', function () {
+            return new SendSMSWithInfoBip();
+        });*/
 
         /*$this->app->singleton('imgur', function(){
             return new ImgurService(new Client());

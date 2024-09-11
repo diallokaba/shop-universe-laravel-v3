@@ -81,8 +81,11 @@ class DetteServiceImpl implements DetteServiceInterface{
 
             $paiement = null;
             
-            if (isset($data['paiement']) && !empty($data['paiement'])) {
+            if (isset($data['paiement']) && $montantDette > 0) {
                 $montant = $data['paiement']['montant'];
+                if($montantDette == $montant){
+                    throw new Exception("Pour que ça soit une dette, l'avance de paiement doit être inferieur à la dette");
+                }
                 if ($montant > 0 && $montant <= $montantDette) {
                     $paiement = Paiement::create([
                         'dette_id' => $dette->id,
@@ -132,6 +135,11 @@ class DetteServiceImpl implements DetteServiceInterface{
 
         if($totalPaiement > $dette->montant){
             throw new Exception('Le montant total de paiement est superieur au montant de la dette.');
+        }
+
+        if($totalPaiement == $dette->montant){
+            $dette->statut = 'solde';
+            $dette->save();
         }
 
         $paiement = Paiement::create([

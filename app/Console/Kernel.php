@@ -2,6 +2,9 @@
 
 namespace App\Console;
 
+use App\Jobs\HelloWorldJob;
+use App\Jobs\SendSms;
+use App\Jobs\SendSMSNotificationJob;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
@@ -13,6 +16,9 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule): void
     {
         // $schedule->command('inspire')->hourly();
+        //$schedule->job(new HelloWorldJob)->everyMinute();
+        //$schedule->job(new SendSMSNotificationJob)->weeklyOn(5, '14:00');
+        $schedule->job(new SendSMSNotificationJob)->everyMinute();
     }
 
     /**

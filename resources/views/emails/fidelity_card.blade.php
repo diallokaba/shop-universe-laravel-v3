@@ -9,8 +9,8 @@
     <h1>Bonjour, {{ $pseudo }}</h1>
     <p>Votre carte de fidélité est maintenant disponible !</p>
     <p>Merci de faire confiance à notre service.</p>
-    <p><strong>Surnom:</strong> {{ $surnom }}</p>
-    <p><strong>Email:</strong> {{ $email }}</p>
+    <p><strong>Surnom:</strong> {{ $surname }}</p>
+    <p><strong>Email:</strong> {{ $login }}</p>
     <p>Veuillez trouver ci-joint votre carte de fidélité en PDF.</p>
 </body>
 </html>

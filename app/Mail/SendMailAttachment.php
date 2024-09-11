@@ -23,8 +23,8 @@ class SendMailAttachment extends Mailable{
             ->attach($this->pdfFile)
             ->with([
                 'pseudo' => $this->user->nom . ' ' . $this->user->prenom,
-                'email' => $this->user->login,
-                'surnom' => $this->client->surnom
+                'login' => $this->user->login,
+                'surnom' => $this->client->surname
             ]);
     }
 
