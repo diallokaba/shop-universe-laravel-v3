@@ -3,7 +3,6 @@
 namespace App\Jobs;
 
 use App\Models\Dette;
-use App\Models\Paiement;
 use App\Services\SendSMSWithInfoBip;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;

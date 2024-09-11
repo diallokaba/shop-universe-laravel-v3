@@ -2,6 +2,8 @@
 
 namespace App\Console;
 
+use App\Jobs\ArchiveDetteJobWithFireBase;
+use App\Jobs\ArchiveDetteJobWithMongo;
 use App\Jobs\HelloWorldJob;
 use App\Jobs\SendSms;
 use App\Jobs\SendSMSNotificationJob;
@@ -15,10 +17,17 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
+        $db_archive = env('DB_ARCHIVE');
         // $schedule->command('inspire')->hourly();
         //$schedule->job(new HelloWorldJob)->everyMinute();
         //$schedule->job(new SendSMSNotificationJob)->weeklyOn(5, '14:00');
-        $schedule->job(new SendSMSNotificationJob)->everyMinute();
+        //$schedule->job(new SendSMSNotificationJob)->everyMinute();
+        if($db_archive == 'mongodb') {
+            //$schedule->job(new ArchiveDetteJobWithMongo)->everyFiveSeconds();
+            $schedule->job(new ArchiveDetteJobWithMongo)->daily();
+        }elseif($db_archive == 'firebase') {
+            $schedule->job(new ArchiveDetteJobWithFireBase)->daily();
+        }
     }
 
     /**

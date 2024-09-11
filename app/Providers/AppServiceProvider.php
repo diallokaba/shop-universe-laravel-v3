@@ -12,6 +12,7 @@ use App\Services\ClientServiceImpl;
 use App\Services\DetteServiceImpl;
 use App\Services\DetteServiceInterface;
 use App\Services\ImgurService;
+use App\Services\MongoClientInterface;
 use App\Services\SendSMSWithInfoBip;
 use App\Services\UploadService;
 use App\Services\UploadServiceImgur;
@@ -23,6 +24,7 @@ use App\Models\User;
 use App\Models\Client;
 use App\Repositories\DetteRepositoryImpl;
 use App\Repositories\DetteRepositoryInterface;
+use App\Services\MongoClientImpl;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -35,6 +37,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(ArticleServiceInterface::class, ArticleServiceImpl::class);
         $this->app->singleton(DetteRepositoryInterface::class, DetteRepositoryImpl::class);
         $this->app->singleton(DetteServiceInterface::class, DetteServiceImpl::class);
+        
         $this->app->singleton('clientRepository', function () {
             return new ClientRepositoryImpl();
         });
@@ -48,6 +51,10 @@ class AppServiceProvider extends ServiceProvider
 
         $this->app->singleton('uploadServiceImgur', function () {
             return new UploadServiceImgur();
+        });
+
+        $this->app->singleton('mongoClient', function () {
+            return new MongoClientImpl();
         });
 
         /*$this->app->singleton('SendSMSWithInfoBip', function () {
