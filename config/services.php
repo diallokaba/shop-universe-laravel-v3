@@ -36,4 +36,15 @@ return [
         'api_key' => env('INFOBIP_API_KEY'),
     ],
 
+    'twilio' => [
+        'account_sid' => env('TWILIO_ACCOUNT_SID'),
+        'auth_token' => env('TWILIO_AUTH_TOKEN'),
+        'from' => env('TWILIO_PHONE_NUMBER'),
+    ],
+
+    'choice' => [
+        'archive' => env('DB_ARCHIVE'),
+        'notification' => env('SERVICE_SMS'),
+    ],
+
 ];

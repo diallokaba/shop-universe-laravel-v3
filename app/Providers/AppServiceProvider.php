@@ -26,6 +26,7 @@ use App\Repositories\DetteRepositoryImpl;
 use App\Repositories\DetteRepositoryInterface;
 use App\Services\FirebaseService;
 use App\Services\MongoClientImpl;
+use App\Services\SendSMSWithTwilio;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -64,6 +65,10 @@ class AppServiceProvider extends ServiceProvider
 
         /*$this->app->singleton('SendSMSWithInfoBip', function () {
             return new SendSMSWithInfoBip();
+        });*/
+
+        /*$this->app->singleton('SendSMSWithTwilio', function () {
+            return new SendSMSWithTwilio();
         });*/
 
         /*$this->app->singleton('imgur', function(){
