@@ -2,7 +2,7 @@
 
 namespace App\Jobs;
 
-use App\Services\SendSMSWithTwilio;
+use App\Services\SendSMSServiceWithTwilio;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -19,7 +19,7 @@ class SendSMSNotificationJobWithTwilio implements ShouldQueue
      */
     public function __construct()
     {
-        $this->twilioService = new SendSMSWithTwilio();
+        $this->twilioService = new SendSMSServiceWithTwilio();
     }
 
     /**
