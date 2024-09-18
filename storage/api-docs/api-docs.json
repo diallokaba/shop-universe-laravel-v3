@@ -1138,6 +1138,375 @@
                 ]
             }
         },
+        "/api/v1/demandes": {
+            "post": {
+                "tags": [
+                    "DemandesDeDette"
+                ],
+                "summary": "Créer une nouvelle demande de dette pour un client",
+                "description": "Permet à un client authentifié de créer une demande de dette en fournissant des détails sur les articles demandés. Le montant total est calculé en fonction des articles et de leurs quantités. Des restrictions sont appliquées selon la catégorie du client (Silver, Bronze).",
+                "operationId": "CreateDetteDemande",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "details_article_demande"
+                                ],
+                                "properties": {
+                                    "details_article_demande": {
+                                        "type": "array",
+                                        "items": {
+                                            "properties": {
+                                                "articleId": {
+                                                    "description": "L'ID de l'article à ajouter à la demande.",
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "qteDemande": {
+                                                    "description": "La quantité demandée de cet article.",
+                                                    "type": "integer",
+                                                    "example": 2
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Demande créée avec succès.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "id": {
+                                            "description": "L'ID de la demande créée.",
+                                            "type": "integer",
+                                            "example": 10
+                                        },
+                                        "client_id": {
+                                            "description": "L'ID du client ayant effectué la demande.",
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "montant": {
+                                            "description": "Le montant total de la demande.",
+                                            "type": "number",
+                                            "format": "float",
+                                            "example": 2500
+                                        },
+                                        "articles": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "articleId": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "qteDemande": {
+                                                        "type": "integer",
+                                                        "example": 2
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Requête invalide - Le client ou les détails de la demande sont incorrects.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Client non trouvé."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Accès refusé - Les restrictions du client empêchent la création de la demande.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Vous ne pouvez pas faire de demande dette car votre montant maximum de dette est atteint."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Aucun article ajouté - La demande ne peut pas être créée.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Impossible de creer cette demande car aucun article n'a pu etre ajouter."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Erreur serveur interne lors de la création de la demande.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Erreur lors de la creation de la demande."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/notification/client/all": {
+            "post": {
+                "tags": [
+                    "NotificationsForManyClients"
+                ],
+                "summary": "Envoyer des notifications de rappel à plusieurs clients en fournissant leurs numéros de téléphone",
+                "description": "Envoie une notification de rappel de dette à une liste de clients spécifiés.",
+                "operationId": "sendRemainderNotificationForManyClient",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "clients"
+                                ],
+                                "properties": {
+                                    "clients": {
+                                        "type": "array",
+                                        "items": {
+                                            "properties": {
+                                                "telephone": {
+                                                    "type": "string",
+                                                    "example": "777669509"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Succès - Notifications envoyées.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "3 clients ont été notifiés"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Requête invalide - Le corps de la requête est incorrect ou incomplet.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Veuillez fournir la clé clients"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Aucun client n'a été notifié.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Aucun client n'a été notifié"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Erreur serveur interne",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Erreur serveur"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/notification/client/message": {
+            "post": {
+                "tags": [
+                    "NotificationsRemainderAndPersonalizedMessage"
+                ],
+                "summary": "Envoyer un message de rappel à plusieurs clients en renseignant le message",
+                "description": "Envoie un message personnalisé de rappel de dette à une liste de clients spécifiés.",
+                "operationId": "sendRemainderSMSNotification",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "clients",
+                                    "message"
+                                ],
+                                "properties": {
+                                    "clients": {
+                                        "type": "array",
+                                        "items": {
+                                            "properties": {
+                                                "telephone": {
+                                                    "type": "string",
+                                                    "example": "777669509"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "message": {
+                                        "type": "string",
+                                        "example": "Bonjour, ceci est un rappel de votre dette. Veuillez la régler dès que possible."
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Succès - Notifications envoyées.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "3 clients ont été notifiés"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Requête invalide - Le corps de la requête est incorrect ou incomplet.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Veuillez fournir la clé clients"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Aucun client n'a été notifié.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Aucun client n'a été notifié"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Erreur serveur interne",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Erreur serveur"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/users": {
             "get": {
                 "tags": [
@@ -1429,6 +1798,18 @@
         {
             "name": "RestaureAllClientArchiveDebtsByClientID",
             "description": "RestaureAllClientArchiveDebtsByClientID"
+        },
+        {
+            "name": "DemandesDeDette",
+            "description": "DemandesDeDette"
+        },
+        {
+            "name": "NotificationsForManyClients",
+            "description": "NotificationsForManyClients"
+        },
+        {
+            "name": "NotificationsRemainderAndPersonalizedMessage",
+            "description": "NotificationsRemainderAndPersonalizedMessage"
         },
         {
             "name": "StoreUser",

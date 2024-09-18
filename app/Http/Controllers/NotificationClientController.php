@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Notifications\SendNotificationForSettledDebt;
+use App\Services\SendSMSServiceWithTwilio;
 use Illuminate\Http\Request;
 
 use App\Facades\ClientServiceFacade as clientService;
+use App\Facades\SendSMSWithTwilioFacade;
 use App\Models\Client;
 use App\Models\Dette;
 use App\Services\SendSMSWithInfoBip;
@@ -14,8 +16,12 @@ use Exception;
 class NotificationClientController extends Controller
 {
     private $sendSmsWithInfoBip;
+    private $sendSmsWithTwilio;
+    private $serviceSmsSelected;
     public function __construct(){
         $this->sendSmsWithInfoBip = new SendSMSWithInfoBip();
+        $this->sendSmsWithTwilio = new SendSMSServiceWithTwilio();
+        $this->serviceSmsSelected = env('SERVICE_SMS');
     } 
    public function sendRemainderNotificationForSettledDebt($id){
         try{    
@@ -36,7 +42,11 @@ class NotificationClientController extends Controller
             }
 
             $message = "Bonjour " . $client->nom . " " . $client->prenom . ", votre total de dette est de : " . number_format($montantRestant, 0, ',', ' ') . " FCFA.";
-            $this->sendSmsWithInfoBip->sendSms($message, $client->telephone);
+            if($this->serviceSmsSelected == 'infobip'){
+                $this->sendSmsWithInfoBip->sendSms($message, $client->telephone);
+            }else if($this->serviceSmsSelected == 'twilio'){
+                $this->sendSmsWithTwilio->sendSms($message, $client->telephone);
+            }
             $client->notify(new SendNotificationForSettledDebt($montantRestant, $client->nom, $client->prenom));
             return response()->json(['message' => 'Opération réussie avec succès'], 200);
         }catch(Exception $e){
@@ -44,6 +54,65 @@ class NotificationClientController extends Controller
         }
    }
 
+   /**
+     * @OA\Post(
+     *     path="/api/v1/notification/client/all",
+     *     operationId="sendRemainderNotificationForManyClient",
+     *     tags={"NotificationsForManyClients"},
+     *     summary="Envoyer des notifications de rappel à plusieurs clients en fournissant leurs numéros de téléphone",
+     *     description="Envoie une notification de rappel de dette à une liste de clients spécifiés.",
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\MediaType(
+     *             mediaType="application/json",
+     *             @OA\Schema(
+     *                 type="object",
+     *                 required={"clients"},
+     *                 @OA\Property(
+     *                     property="clients",
+     *                     type="array",
+     *                     @OA\Items(
+     *                         type="object",
+     *                         @OA\Property(property="telephone", type="string", example="777669509")
+     *                     )
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Succès - Notifications envoyées.",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="message", type="string", example="3 clients ont été notifiés")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Requête invalide - Le corps de la requête est incorrect ou incomplet.",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="message", type="string", example="Veuillez fournir la clé clients")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Aucun client n'a été notifié.",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="message", type="string", example="Aucun client n'a été notifié")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Erreur serveur interne",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="message", type="string", example="Erreur serveur")
+     *         )
+     *     )
+     * )
+     */
    public function sendRemainderNotificationForManyClient(Request $request){
     if(!$request->has('clients')){
         return response()->json(['message' => 'Veuillez fournir la clé clients'], 400);
@@ -70,7 +139,11 @@ class NotificationClientController extends Controller
                 }
 
                 $message = "Bonjour " . $client->nom . " " . $client->prenom . ", votre total de dette est de : " . number_format($montantRestant, 0, ',', ' ') . " FCFA.";
-                $this->sendSmsWithInfoBip->sendSms($message, $client->telephone);
+                if($this->serviceSmsSelected == 'infobip'){
+                    $this->sendSmsWithInfoBip->sendSms($message, $client->telephone);
+                }else if($this->serviceSmsSelected == 'twilio'){
+                    $this->sendSmsWithTwilio->sendSms($message, $client->telephone);
+                }
                 $client->notify(new SendNotificationForSettledDebt($montantRestant, $client->nom, $client->prenom));
             }
         }
@@ -83,6 +156,70 @@ class NotificationClientController extends Controller
     }
    }
 
+   /**
+     * @OA\Post(
+     *     path="/api/v1/notification/client/message",
+     *     operationId="sendRemainderSMSNotification",
+     *     tags={"NotificationsRemainderAndPersonalizedMessage"},
+     *     summary="Envoyer un message de rappel à plusieurs clients en renseignant le message",
+     *     description="Envoie un message personnalisé de rappel de dette à une liste de clients spécifiés.",
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\MediaType(
+     *             mediaType="application/json",
+     *             @OA\Schema(
+     *                 type="object",
+     *                 required={"clients", "message"},
+     *                 @OA\Property(
+     *                     property="clients",
+     *                     type="array",
+     *                     @OA\Items(
+     *                         type="object",
+     *                         @OA\Property(property="telephone", type="string", example="777669509")
+     *                     )
+     *                 ),
+     *                 @OA\Property(
+     *                     property="message",
+     *                     type="string",
+     *                     example="Bonjour, ceci est un rappel de votre dette. Veuillez la régler dès que possible."
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Succès - Notifications envoyées.",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="message", type="string", example="3 clients ont été notifiés")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Requête invalide - Le corps de la requête est incorrect ou incomplet.",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="message", type="string", example="Veuillez fournir la clé clients")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Aucun client n'a été notifié.",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="message", type="string", example="Aucun client n'a été notifié")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Erreur serveur interne",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="message", type="string", example="Erreur serveur")
+     *         )
+     *     )
+     * )
+     */
    public function sendRemainderSMSNotification(Request $request){
         if(!$request->has('clients')){
             return response()->json(['message' => 'Veuillez fournir la clé clients'], 400);
@@ -114,7 +251,11 @@ class NotificationClientController extends Controller
                     }*/
 
                     $nbClientSendNotif++;
-                    $this->sendSmsWithInfoBip->sendSms($message, $client->telephone);
+                    if($this->serviceSmsSelected == 'infobip'){
+                        $this->sendSmsWithInfoBip->sendSms($message, $client->telephone);
+                    }else if($this->serviceSmsSelected == 'twilio'){
+                        $this->sendSmsWithTwilio->sendSms($message, $client->telephone);
+                    }
                     $client->notify(new SendNotificationForSettledDebt(null, $client->nom, $client->prenom, $message));
                 }
             }

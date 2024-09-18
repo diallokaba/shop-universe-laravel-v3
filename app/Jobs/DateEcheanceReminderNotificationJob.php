@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Models\Dette;
 use App\Notifications\SendNotificationForSettledDebt;
+use App\Services\SendSMSServiceWithTwilio;
 use App\Services\SendSMSWithInfoBip;
 use Exception;
 use Illuminate\Bus\Queueable;
@@ -21,9 +22,13 @@ class DateEcheanceReminderNotificationJob implements ShouldQueue
      */
 
     private $sendSmsWithInfoBip;
+    private $sendSmsWithTwilio;
+    private $serviceSmsSelected;
     public function __construct()
     {
         $this->sendSmsWithInfoBip = new SendSMSWithInfoBip();
+        $this->sendSmsWithTwilio = new SendSMSServiceWithTwilio();
+        $this->serviceSmsSelected = env('SERVICE_SMS');
     }
 
     /**
@@ -64,8 +69,11 @@ class DateEcheanceReminderNotificationJob implements ShouldQueue
                     
                     //Envoie de SMS
                     $message = "Bonjour " . $client->nom . " " . $client->prenom . ", votre total de dette est de : " . number_format($dette['montant_total'], 0, ',', ' ') . " FCFA.";
-                    $this->sendSmsWithInfoBip->sendSms($message, $client->telephone);
-
+                    if($this->serviceSmsSelected == 'infobip'){
+                        $this->sendSmsWithInfoBip->sendSms($message, $client->telephone);
+                    }else if($this->serviceSmsSelected == 'twilio'){
+                        $this->sendSmsWithTwilio->sendSms($message, $client->telephone);
+                    }
                     //Envoie de notification
                     $client->notify(new SendNotificationForSettledDebt($dette['montant_total'], $client->nom, $client->prenom));
                 }
