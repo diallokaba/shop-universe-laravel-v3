@@ -50,7 +50,7 @@ class DetteServiceImpl implements DetteServiceInterface{
             $montantDette = 0;
             $clientId = $data["client"]["id"];
 
-            $dette = $this->detteRepository->create(["client_id" => $clientId, "montant" => $montantDette]);
+            $dette = $this->detteRepository->create(["client_id" => $clientId, "montant" => $montantDette, "echeance" => $data["echeance"] ?? null]);
             if (!$dette) {
                 throw new Exception('Erreur lors de la création de la dette. La dette n\'a pas pu être créée.');
             }
@@ -67,13 +67,18 @@ class DetteServiceImpl implements DetteServiceInterface{
 
                     $montantDette += $qteVente * $prixVente;
 
-                    $dette->articles()->attach($articleId, ['qteVente' => $qteVente, 'prixVente' => $prixVente]);
+                    $dette->articles()->attach($articleId, ['qteVente' => $qteVente, 'prixVente' => $prixVente, 'created_at' => now(), 'updated_at' => now()]);
 
                     $articleSuccess[] = $articleId;
                   
                 }else{
                     $articleFailed[] = $articleId;
                 }                
+            }
+
+            if(empty($articleSuccess)){
+                DB::rollBack();
+                throw new Exception("Impossible de creer la dette car aucun article n'a pu etre ajouter");
             }
 
             $dette->montant = $montantDette;
@@ -83,10 +88,12 @@ class DetteServiceImpl implements DetteServiceInterface{
             
             if (isset($data['paiement']) && $montantDette > 0) {
                 $montant = $data['paiement']['montant'];
-                if($montantDette == $montant){
-                    throw new Exception("Pour que ça soit une dette, l'avance de paiement doit être inferieur à la dette");
+                if($montantDette <= $montant){
+                    DB::rollBack();
+                    throw new Exception("Le montant du premier paiement doit etre inferieur au montant total de la la dette");
                 }
-                if ($montant > 0 && $montant <= $montantDette) {
+                
+                if ($montant > 0 && $montant < $montantDette) {
                     $paiement = Paiement::create([
                         'dette_id' => $dette->id,
                         'montant' => $montant
@@ -114,7 +121,7 @@ class DetteServiceImpl implements DetteServiceInterface{
     }
 
     public function paiement($id, $request){
-        $dette = $this->find($id);
+        $dette = $this->detteRepository->find($id);
         if(!$dette){
            throw new Exception('La dette avec l\'id ' . $id . ' n\'existe pas.'); 
         }
@@ -128,6 +135,8 @@ class DetteServiceImpl implements DetteServiceInterface{
                 $totalPaiement += $paiement['montant'];
             }
         }
+
+        
 
         $montant = $request->input('montant');
 
@@ -151,6 +160,29 @@ class DetteServiceImpl implements DetteServiceInterface{
     }
 
     public function find($id){
-        return $this->detteRepository->find($id);
+        //dd(gettype($id));
+        if(!is_numeric($id)){
+            throw new Exception('L\'id doit être un nombre entier');
+        }
+        $id = (int)$id;
+        return $this->detteRepository->find($id)->with('client')->first();
+    }
+
+    public function detbsWithDetails($id){
+        //dd(gettype($id));
+        if(!is_numeric($id)){
+            throw new Exception('L\'id doit être un nombre entier');
+        }
+        $id = (int)$id;
+        return $this->detteRepository->detbsWithDetails($id);
+    }
+
+    public function debtsWithPayments($id){
+        //dd(gettype($id));
+        if(!is_numeric($id)){
+            throw new Exception('L\'id doit être un nombre entier');
+        }
+        $id = (int)$id;
+        return $this->detteRepository->debtsWithPayments($id);
     }
 }

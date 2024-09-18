@@ -26,8 +26,8 @@ class ArticleRequest extends FormRequest
         return [
             'libelle' => 'required|string|unique:articles,libelle|max:255',
             'reference' => 'required|string|unique:articles,reference|max:255',
-            'prix' => 'required|numeric|min:0',
-            'quantite' => 'required|integer|min:0',
+            'prix' => 'required|integer|min:1',
+            'quantite' => 'required|integer|min:1',
         ];
     }
 
@@ -35,19 +35,19 @@ class ArticleRequest extends FormRequest
     {
         return [
             'libelle.required' => 'Le libellé est obligatoire.',
-            'libelle.string' => 'Le libellé doit contenir uniquement des lettres et des chiffres.',
+            'libelle.string' => 'Le libellé est une chaine de caractère',
             'libelle.unique' => 'Ce libellé existe déjà.',
-            'libelle.max' => 'Le libellé doit faire maximum 255 caractères.',
+            'libelle.max' => 'Le libellé doit contenir maximum 255 caractères.',
             'reference.required' => 'La référence est obligatoire.',
-            'reference.string' => 'La référence doit contenir uniquement des lettres et des chiffres.',
+            'reference.string' => 'La référence est une chaîne de caractère',
             'reference.unique' => 'Cette référence existe déjà.',
-            'reference.max' => 'La référence doit faire maximum 255 caractères.',
+            'reference.max' => 'La référence doit contenir maximum 255 caractères.',
             'prix.required' => 'Le prix est obligatoire.',
-            'prix.numeric' => 'Le prix doit être un nombre valide.',
-            'prix.min' => 'Le prix en stock doit être un nombre positif.',
+            'prix.integer' => 'Le prix doit être un nombre entier.',
+            'prix.min' => 'Le prix prix minimum est 1.',
             'quantite.required' => 'La quantité en stock est obligatoire.',
             'quantite.integer' => 'La quantité en stock doit être un nombre entier.',
-            'quantite.min' => 'La quantité en stock doit être un nombre positif.',
+            'quantite.min' => 'La quantité en stock minimale est 1.',
         ];
     }
 

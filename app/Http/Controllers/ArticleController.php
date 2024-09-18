@@ -109,6 +109,10 @@ class ArticleController extends Controller
                 }
             }
 
+            if(empty($updatedArticles)){
+                return $this->sendResponse(['error' => $notFoundArticles], StatusResponseEnum::ECHEC, 'aucun article n\'a été mis à jour', 400);
+            }
+
             DB::commit();
 
             return $this->sendResponse([
@@ -194,8 +198,8 @@ class ArticleController extends Controller
 
     public function store(ArticleRequest $request){
         try {
-            $articleData = $request->only('libelle','reference', 'prix', 'quantite');
-            $article = Article::create($articleData);
+            $articleData = $request->only('libelle', 'reference', 'prix', 'quantite');
+            $article = $this->articleService->create($articleData);
             return $this->sendResponse($article, StatusResponseEnum::SUCCESS, 'Article enregistre avec succès', 201);
         } catch (Exception $e) {
             return $this->sendResponse(['error' => $e->getMessage()], StatusResponseEnum::ECHEC, 500);

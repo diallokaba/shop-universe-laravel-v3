@@ -30,7 +30,8 @@ class DetteRequest extends FormRequest
             'details_dette.*.articleId' => ['required', 'integer'],
             'details_dette.*.qteVente' => ['required', 'integer', 'min:1'], 
             'details_dette.*.prixVente' => ['required', 'integer', 'min:1'], 
-            'paiement.montant' => ['nullable', 'integer', 'min:0'],
+            'paiement.montant' => ['nullable', 'integer', 'min:1'],
+            'echeance' => ['nullable', 'date', 'after:today'],
         ];
     }
 
@@ -41,7 +42,7 @@ class DetteRequest extends FormRequest
             'client.id.exists' => 'Le client avec cet id n\'existe pas',
             'details_dette.required' => 'Les détails de la dette sont obligatoires',
             'details_dette.array' => 'Les détails de la dette doivent être un tableau',
-            'details_dette.min' => 'Il doit y avoir au moins un objet dans les détails de la dette',
+            'details_dette.min' => 'Il doit y avoir au minimum un article dans les détails de la dette',
             'details_dette.*.articleId.required' => 'L\'id de l\'article est obligatoire pour chaque détail',
             'details_dette.*.articleId.integer' => 'L\'id de l\'article est obligatoire pour chaque détail',
             //'details_dette.*.article_id.exists' => 'L\'article sélectionné n\'existe pas',
@@ -52,8 +53,9 @@ class DetteRequest extends FormRequest
             'details_dette.*.prixVente.integer' => 'Le prix de vente doit être un nombre entier',
             'details_dette.*.prixVente.min' => 'Le prix de vente doit être au minimum 1',
             'paiement.montant.integer' => 'Le montant du paiement doit être un nombre entier',
-            'paiement.montant.min' => 'Le montant du paiement ne doit pas être inférieur à 0',
-            
+            'paiement.montant.min' => 'Le montant du paiement doit être supérieur à 0',
+            'echeance.date' => 'La date d\'échéance doit être une date valide',
+            'echeance.after' => 'L\'échéance doit être une date supérieur à la date du jour'
         ];
     }
 

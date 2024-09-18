@@ -6,16 +6,21 @@ use App\Enums\StatusResponseEnum;
 use App\Http\Requests\UserRequest;
 use App\Models\Role;
 use App\Models\User;
+use App\Services\UserServiceInterface;
 use App\Traits\RestResponseTrait;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
 
     use RestResponseTrait;
+    private $userService;
+
+    public function __construct(UserServiceInterface $userService){
+        $this->userService = $userService;
+    }
 
     /**
      * @OA\Post(
@@ -77,18 +82,8 @@ class UserController extends Controller
      */
     public function store(UserRequest $request) {
         try{
-
-            $userRequest = $request->only('nom', 'prenom', 'login', 'password', 'photo');
-
-            $roleId = $request->input('role.id');
-
-            $role = Role::find($roleId);
-
-            $userRequest['password'] = Hash::make($userRequest['password']);
-            $userRequest['role_id'] = $role->id; 
-
-            $user = User::create($userRequest);
-
+            $userRequest = $request->only('nom', 'prenom', 'login', 'password', 'photo', 'role');
+            $user = $this->userService->create($userRequest);
             return $this->sendResponse($user, StatusResponseEnum::SUCCESS, 'Utilisateur créé avec succès', 201);
         }catch(Exception $e){
             return $this->sendResponse(null, StatusResponseEnum::ECHEC, $e->getMessage(), 500);
@@ -135,39 +130,8 @@ class UserController extends Controller
      */
     public function index(Request $request) {
         try{
-            $users = User::query();
-            if ($request->has('role')) {
-                $value = $request->get('role');
-                switch (strtoupper($value)) {
-                    case 'ADMIN':
-                        $users->where('role_id', 1);
-                        break;
-                    case 'BOUTIQUIER':
-                        $users->where('role_id', 2);
-                        break;
-                    case 'CLIENT':
-                        $users->where('role_id', 3);
-                        break;
-                    default:
-                        break;
-                }
-            }
-            if ($request->has('active')) {
-                $value = strtoupper($request->get('active'));  // Convertir en majusculesq
-                switch (strtoupper($value)) {
-                    case 'OUI':
-                        $users->where('active', 'OUI');
-                        break;
-                    case 'NON':
-                        $users->where('active', 'NON');
-                        break;
-                    default:
-                        break;
-                }
-            }
-            $users = $users->get();
-
-            // Retourner la réponse
+            $users = $this->userService->query($request);
+            
             if ($users->isNotEmpty()) {
                 return $this->sendResponse($users, StatusResponseEnum::SUCCESS, 'Utilisateurs récupérés avec succès.');
             } else {

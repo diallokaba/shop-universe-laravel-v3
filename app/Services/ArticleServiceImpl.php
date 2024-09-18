@@ -2,6 +2,7 @@
 
 namespace App\Services;
 use App\Repositories\ArticleRepositoryInterface;
+use Exception;
 
 class ArticleServiceImpl implements ArticleServiceInterface{
 
@@ -17,8 +18,11 @@ class ArticleServiceImpl implements ArticleServiceInterface{
 
     public function create(array $articles)
     {
-        // TODO: Implement create() method.
-        return $this->articleRepository->create($articles);
+        try{
+            return $this->articleRepository->create($articles);
+        }catch(Exception $e){
+            throw new Exception('Erreur lors de la création de l\'article : ' . $e->getMessage());
+        }
     }
 
     public function find($id)

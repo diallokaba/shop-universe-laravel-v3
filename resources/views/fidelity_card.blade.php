@@ -11,7 +11,7 @@
 </head>
 <body>
     <h1>Carte de Fidélité</h1>
-    <p><strong>Nom:</strong> {{ $pseudo }}</p>
+    <p><strong>Nom et prenom:</strong> {{ $pseudo }}</p>
     <p><strong>Email:</strong> {{ $email }}</p>
     @if($qrCodeImageUrl)
     <img src="{{ $qrCodeImageUrl }}" alt="QR Code">

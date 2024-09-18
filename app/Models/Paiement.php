@@ -9,7 +9,7 @@ class Paiement extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['montant', 'dette_id'];
+    protected $fillable = ['montant', 'dette_id', 'created_at', 'updated_at'];
 
     protected $hidden = ['updated_at'];
 

@@ -33,11 +33,21 @@ class ClientServiceImpl implements ClientServiceInterface
 
     public function create(array $data){
 
-        return DB::transaction(function () use ($data) {        
+        return DB::transaction(function () use ($data) {  
+            $idCategoryClient = $data['category_client']['id'];
+            $maxMontant = null;
+            if($idCategoryClient == 2){
+                $maxMontant = $data['max_montant'];
+                if(!$maxMontant){
+                    throw new Exception('Le montant maximum doit être renseigné pour les clients de catégorie "Silver(Argent)".');
+                }
+            }    
             return clientRepository::create([
                 'surname' => $data['surname'],
                 'telephone' => $data['telephone'],
                 'adresse' => $data['adresse'],
+                'category_client_id' => $idCategoryClient,
+                'max_montant' => $maxMontant ?? null,
             ]);
         });
     }
@@ -220,15 +230,32 @@ class ClientServiceImpl implements ClientServiceInterface
         return clientRepository::where('telephone', $phone)->first();
     }
 
-    public function getById($id)
+    public function find($id)
     {
-        // TODO: Implement getById() method.
+        if (!is_numeric($id)) {
+            throw new Exception('L\'identifiant doit être un nombre valide.');
+        }
+
         return clientRepository::find($id);
     }
 
-    public function clientWithUser($id)
+    public function clientWithHisAccount($id)
     {
-        // TODO: Implement clientWithUser() method.
-        return clientRepository::with('user')->find($id);
+        try{
+            if (!is_numeric($id)) {
+                throw new Exception('L\'identifiant doit être un nombre valide.');
+            }
+            return clientRepository::clientWithHisAccount($id);
+        }catch(Exception $e){
+            throw new Exception('Erreur lors de la récupération du client avec son compte ' . $e->getMessage());
+        }
+    }
+
+    public function getClientWithHisDebts($id){
+        try{
+            return clientRepository::getClientWithHisDebts($id);
+        }catch(Exception $e){
+            throw new Exception('Erreur lors de la récupération du client avec ses dettes ' . $e->getMessage());
+        }
     }
 }

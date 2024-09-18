@@ -11,5 +11,7 @@ interface DetteServiceInterface
     public function filter($request);
     public function paiement($id, $request);
     public function find($id);
+    public function detbsWithDetails($id);
+    public function debtsWithPayments($id);
 
 }

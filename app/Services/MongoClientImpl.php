@@ -10,7 +10,7 @@ class MongoClientImpl implements MongoClientInterface{
 
     public function __construct(){
 
-        $this->client = new Client(env('MONGO_URL'));
+        $this->client = new Client('mongodb+srv://diallo:Passer123@cluster0.dh8zvpu.mongodb.net/shop-universe-laravel-archive?retryWrites=true&w=majority&appName=Cluster0');
     }
     public function getClient()
     {

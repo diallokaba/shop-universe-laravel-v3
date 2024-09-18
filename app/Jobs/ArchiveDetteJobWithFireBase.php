@@ -11,6 +11,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class ArchiveDetteJobWithFireBase implements ShouldQueue
 {
@@ -29,34 +30,44 @@ class ArchiveDetteJobWithFireBase implements ShouldQueue
      */
     public function handle(): void
     {
-        // Récupérer les dettes soldées de la base de données locale
-        DB::beginTransaction();
-        $dettes = Dette::with(['paiements', 'client'])->where('statut', 'solde')->get();
+        echo 'Archive debts Job started at ' . now() . ' with Firebase';
+        try{
 
-        // Définir une référence de collection pour archiver par jour
-        $firebaseClient = FirebaseClientFacade::getCollection('archives/' . Carbon::now()->format('Y_m_d'));
+            $dettes = Dette::with(['paiements', 'client', 'articles'])->where('statut', 'solde')->get();
 
-        foreach ($dettes as $dette) {
-            // Préparer les données pour l'archivage
-            $data = [
-                'dette' => $dette->toArray(),
-                'details_dette' => $dette->details_dette->toArray(),
-                'paiements' => $dette->paiements->toArray(),
-                'client' => $dette->client->toArray(),
-                'archived_at' => now(),
-            ];
+            if($dettes->isEmpty()){
+                echo 'Aucune dette à archiver';
+                return;
+            }
 
-            // Insérer les données dans Firebase
-            $firebaseClient->getReference()->push($data);
+            DB::beginTransaction();
+            
+            $firebaseClient = FirebaseClientFacade::getCollection('archives/' . Carbon::now()->format('Y_m_d'));
+            $archiveName =  'archives/' . Carbon::now()->format('Y_m_d');
 
-            // Supprimer les données locales une fois archivées
-            $dette->details_dette()->delete();
-            $dette->paiements()->delete();
-            $dette->delete();
-        }
-
-        DB::commit(); 
-
-        echo "Les dettes soldées ont été archivées avec succès dans Firebase.\n";
+            foreach ($dettes as $dette) {
+                $data = [
+                    'dette' => $dette->toArray()
+                ];
+    
+                // Insérer les données dans Firebase
+                FirebaseClientFacade::upsertDocument($archiveName, uniqid().'_'.time(), $data);
+    
+                // Supprimer les données locales une fois archivées
+                DB::table('details_dette')->where('dette_id', $dette->id)->delete();
+                $dette->paiements()->delete();
+                $dette->delete();
+            }
+    
+            DB::commit(); 
+    
+            echo "Les dettes soldées ont été archivées avec succès dans Firebase.\n";
+            
+        }catch (\Exception $e) {
+            // Annuler la transaction en cas d'erreur
+            DB::rollBack();
+            Log::error('Erreur lors de l\'archivage des dettes : ' . $e->getMessage());
+            echo "Erreur lors de l'archivage des dettes : " . $e->getMessage() . "\n";
+        }          
     }
 }

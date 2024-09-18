@@ -28,6 +28,7 @@ class ClientRequest extends FormRequest
         $rules = [
             'surname' => ['required', 'string', 'max:255','unique:clients,surname'],
             'telephone' => ['required', 'unique:clients,telephone', new TelephoneRule()],
+            'category_client.id' => ['required_with:id','integer', 'exists:category_clients,id'],
 
              // Validation conditionnelle si un utilisateur doit être créé
             'user' => ['sometimes', 'array'],
@@ -50,6 +51,8 @@ class ClientRequest extends FormRequest
             'surname.unique' => 'Ce surnom existe déjà.',
             'telephone.required' => 'Le numéro de téléphone est obligatoire.',
             'telephone.unique' => 'Ce numéro existe déjà.',
+            'cateogry_client.id.exists' => "Cette catégorie de client n'existe pas.",
+            'cateogry_client.id.required_with' => "La category du client est obligatoire.",
 
             'user.nom.required_with' => 'Le nom est obligatoire',
             'user.nom.min' => 'Le nom doit avoir au moins 2 caractères.',

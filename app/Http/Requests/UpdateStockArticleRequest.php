@@ -25,7 +25,7 @@ class UpdateStockArticleRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'qteStock' => 'required|numeric|min:0',
+            'qteStock' => 'required|integer|min:1',
         ];
     }
 
@@ -33,8 +33,8 @@ class UpdateStockArticleRequest extends FormRequest
     {
         return [
             'qteStock.required' => 'La quantité de stock est obligatoire.',
-            'qteStock.numeric' => 'La quantité de stock doit être un nombre.',
-            'qteStock.min' => 'La quantité de stock doit être positive.',
+            'qteStock.integer' => 'La quantité de stock doit être un nombre entier',
+            'qteStock.min' => 'La quantité de stock doit être positive et supérieur à 0.',
         ];
     }
 

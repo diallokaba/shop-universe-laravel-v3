@@ -18,6 +18,7 @@ class ClientResource extends JsonResource
             'surname' => $this->surname,
             'telephone' => $this->telephone,
             'adresse' => $this->adresse,
+            'qrcode' => $this->qrcode,
             'user' => new UserResource($this->whenLoaded('user')),
         ];
     }

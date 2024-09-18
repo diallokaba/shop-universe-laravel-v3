@@ -10,7 +10,7 @@ class Dette extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['montant', 'client_id'];
+    protected $fillable = ['montant', 'client_id', 'statut', 'created_at', 'updated_at'];
 
     protected $hidden = ['updated_at'];
 
@@ -21,7 +21,7 @@ class Dette extends Model
 
     public function articles()
     {
-        return $this->belongsToMany(Article::class, 'details_dette')->withPivot('qteVente', 'prixVente');
+        return $this->belongsToMany(Article::class, 'details_dette')->withPivot('qteVente', 'prixVente', 'created_at');
     }
 
     public function paiements()

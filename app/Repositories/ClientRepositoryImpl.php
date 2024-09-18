@@ -34,15 +34,20 @@ class ClientRepositoryImpl implements ClientRepositoryInterface{
         return Client::where('telephone', $phone)->first();
     }
 
-    public function getById($id)
+    public function find($id)
     {
         // TODO: Implement getById() method.
         return Client::find($id);
     }
 
-    public function clientWithUser($id)
+    public function clientWithHisAccount($id)
     {
-        // TODO: Implement clientWithUser() method.
-        return Client::with('user')->find($id);
+        return Client::with('user')->findOrFail($id);
+    }
+
+    public function getClientWithHisDebts($id)
+    {
+        // TODO: Implement getClientWithHisDebts() method.
+        return Client::with('dettes')->findOrFail($id);
     }
 }

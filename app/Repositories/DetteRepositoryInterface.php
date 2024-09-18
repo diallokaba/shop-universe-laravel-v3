@@ -11,4 +11,6 @@ interface DetteRepositoryInterface
     public function findOrFail($id);
     public function find($id);
     public function filter();
+    public function detbsWithDetails($id);
+    public function debtsWithPayments($id);
 }

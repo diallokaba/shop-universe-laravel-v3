@@ -39,6 +39,10 @@ class ClientObserver
                 throw new Exception('Rôle non trouvé avec l\'ID: ' . $roleId);
             }
 
+            if($roleId != 3){
+                throw new Exception('Le compte de l\'utilisateur doit avoir un rôle CLIENT');
+            }
+
             $photoUrl = 'https://cdn-icons-png.flaticon.com/128/17346/17346780.png';
             if (isset($data['user']['photo']) && $data['user']['photo'] instanceof UploadedFile) {
                 $photoUrl = $data['user']['photo']->getRealPath();

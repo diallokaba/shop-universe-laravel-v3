@@ -130,7 +130,7 @@ class ClientController extends Controller
 
     public function store(ClientRequest $request){
       
-        $clientRequest = $request->only('surname','adresse','telephone', 'user');
+        $clientRequest = $request->only('surname','adresse','telephone', 'user', 'category_client');
         $client = clientService::create($clientRequest);
         return $client;
         //return $this->sendResponse(new ClientResource($client), StatusResponseEnum::SUCCESS, 'Client créé avec succès', 201);
@@ -227,11 +227,11 @@ class ClientController extends Controller
 
     public function index(Request $request) {
         try{
-            $clients = Client::filter($request)->get();
+            $clients = Client::filter($request)->with('user')->get();
             
             // Retourner la réponse
             if ($clients->isNotEmpty()) {
-                return $this->sendResponse($clients, StatusResponseEnum::SUCCESS, 'Liste des clients.');
+                return $this->sendResponse(ClientResource::collection($clients), StatusResponseEnum::SUCCESS, 'Liste des clients.');
             } else {
                 return $this->sendResponse([], StatusResponseEnum::SUCCESS, 'Pas de clients.');
             }
@@ -327,13 +327,9 @@ class ClientController extends Controller
      * )
      */
     public function getById($id){
-        // Vérifier si l'ID est valide
-        if (!is_numeric($id)) {
-            return $this->sendResponse(null, StatusResponseEnum::ECHEC, 'L\'identifiant doit être un nombre valide.', 400);
-        }
 
-        // Récupérer le client par ID
-        $client = Client::find($id);
+        
+        $client = clientService::find($id);
         
         // Vérifier si le client existe
         if (!$client) {
@@ -374,14 +370,9 @@ class ClientController extends Controller
      *     @OA\Response(response=500, description="Internal server error")
      * )
      */
-    public function clientWithUser($id){
-        // Vérifier si l'ID est valide
-        if (!is_numeric($id)) {
-            return $this->sendResponse(null, StatusResponseEnum::ECHEC, 'L\'identifiant doit être un nombre valide.', 400);
-        }
+    public function clientWithHisAccount($id){        
 
-        // Récupérer le client par ID avec la relation 'user'
-        $client = Client::with('user')->find($id);
+        $client = clientService::clientWithHisAccount($id);
         
         // Vérifier si le client existe
         if (!$client) {
@@ -390,6 +381,16 @@ class ClientController extends Controller
 
         // Retourner le client trouvé
         return $this->sendResponse(new ClientResource($client), StatusResponseEnum::SUCCESS, 'Client trouvé avec succès.', 200);
+    }
+
+    public function debtsByClientId($id){
+        $clientWithDebts = clientService::getClientWithHisDebts($id);
+        
+        if($clientWithDebts){
+            return $this->sendResponse($clientWithDebts, StatusResponseEnum::SUCCESS, 'Client avec des dettes.', 200);
+        }else{
+            return $this->sendResponse(null, StatusResponseEnum::ECHEC, 'Client sans dettes.', 404);
+        }
     }
 
 }

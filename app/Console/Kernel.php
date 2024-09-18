@@ -28,14 +28,17 @@ class Kernel extends ConsoleKernel
         //$schedule->job(new HelloWorldJob)->everyMinute();
         
         //$schedule->job(new SendSMSNotificationJob)->everyMinute();
-        if($notificationService == 'twilio') {
+        /*if($notificationService == 'twilio') {
             $schedule->job(new SendSMSNotificationJobWithTwilio)->everyFiveSeconds();
         }elseif($notificationService == 'infobip') {
-            $schedule->job(new SendSMSNotificationJob)->weeklyOn(5, '14:00');
-        }
+            $schedule->job(new SendSMSNotificationJob)->everyFiveSeconds();
+            //$schedule->job(new SendSMSNotificationJob)->weeklyOn(5, '14:00');
+        }*/
         
+        //$schedule->job(new ArchiveDetteJobWithFireBase)->everyFiveSeconds();
+        //$schedule->job(new ArchiveDetteJobWithMongo)->everyFiveSeconds();
         if($archiveService == 'mongodb') {
-            //$schedule->job(new ArchiveDetteJobWithMongo)->everyFiveSeconds();
+            $schedule->job(new ArchiveDetteJobWithMongo)->everyFiveSeconds();
             //$schedule->job(new ArchiveDetteJobWithMongo)->daily();
         }elseif($archiveService == 'firebase') {
             //$schedule->job(new ArchiveDetteJobWithFireBase)->everyFiveSeconds();

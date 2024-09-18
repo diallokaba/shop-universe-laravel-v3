@@ -39,4 +39,12 @@ class DetteRepositoryImpl implements DetteRepositoryInterface
     public function filter(){
         return Dette::query();
     }
+
+    public function detbsWithDetails($id){
+        return Dette::with('articles')->where('id', $id)->get();
+    }
+
+    public function debtsWithPayments($id){
+        return Dette::with('paiements')->where('id', $id)->get();
+    }
 }

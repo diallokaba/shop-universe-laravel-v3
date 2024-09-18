@@ -8,6 +8,7 @@ use App\Http\Requests\RegisterRequest;
 use App\Http\Requests\RegistreRequest;
 use App\Http\Resources\ClientResource;
 use App\Http\Resources\UserResource;
+use App\Mail\WelcomeEmail;
 use App\Models\Client;
 use App\Models\User;
 use App\Services\AuthenticationServiceInterface;
@@ -18,6 +19,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 
 /**
  * @OA\Info(
@@ -120,6 +122,10 @@ class AuthController extends Controller
 
             // Hachage du mot de passe
             $userRequest['password'] = Hash::make($userRequest['password']);
+
+            if (filter_var($userRequest['login'], FILTER_VALIDATE_EMAIL)) {
+                Mail::to($userRequest['login'])->send(new WelcomeEmail(["nom" => $userRequest['nom'], "prenom" => $userRequest['prenom']]));
+            }
 
              // Création de l'utilisateur
             $user = User::create($userRequest);

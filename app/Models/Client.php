@@ -5,16 +5,17 @@ namespace App\Models;
 use App\Observers\ClientObserver;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Notifications\Notifiable;
 
 class Client extends Model
 {
-    use HasFactory;
+    use HasFactory, Notifiable;
 
     public function __construct(){
         
     }
 
-    protected $fillable = ['surname','telephone', 'adresse', 'qrcode'];
+    protected $fillable = ['surname','telephone', 'adresse', 'qrcode', 'category_client_id', 'max_montant'];
 
     protected $hidden = ['created_at', 'updated_at'];
 
@@ -26,6 +27,12 @@ class Client extends Model
     function dettes() {
         return $this->hasMany(Dette::class);
     }
+
+    public function category()
+    {
+        return $this->belongsTo(CategoryClient::class, 'category_client_id');
+    }
+
 
     public function scopeFilter($query, $request){
         // Filtrer par comptes (avec ou sans utilisateur)
@@ -65,6 +72,11 @@ class Client extends Model
     {
         parent::boot();
         self::observe(ClientObserver::class);
+    }
+
+    public function routeNotificationForSms()
+    {
+        return $this->telephone;  // Champ utilisé pour l'envoi des SMS
     }
 
 }
