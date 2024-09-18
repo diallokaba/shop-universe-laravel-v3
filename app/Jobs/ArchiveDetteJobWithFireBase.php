@@ -42,7 +42,7 @@ class ArchiveDetteJobWithFireBase implements ShouldQueue
 
             DB::beginTransaction();
             
-            $firebaseClient = FirebaseClientFacade::getCollection('archives/' . Carbon::now()->format('Y_m_d'));
+            FirebaseClientFacade::getCollection('archives/' . Carbon::now()->format('Y_m_d'));
             $archiveName =  'archives/' . Carbon::now()->format('Y_m_d');
 
             foreach ($dettes as $dette) {

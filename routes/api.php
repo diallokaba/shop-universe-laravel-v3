@@ -4,7 +4,8 @@ use App\Http\Controllers\ArticleController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\DemandeController;
-use App\Http\Controllers\DetteArchiveController;
+use App\Http\Controllers\DetteArchiveWithFireBaseController;
+use App\Http\Controllers\DetteArchiveWithMongoController;
 use App\Http\Controllers\DetteController;
 use App\Http\Controllers\NotificationClientController;
 use App\Http\Controllers\UserController;
@@ -34,12 +35,22 @@ Route::group([
 
     Route::get('/dettes/settled/all', [DetteController::class, 'settledDebts']);
 
-    Route::get('/dettes/archive', [DetteArchiveController::class, 'archiveDette']);
-    Route::get('/archive/clients/{id}/dettes', [DetteArchiveController::class, 'archiveClientDebts']);
-    Route::get('/archive/dettes/{id}', [DetteArchiveController::class, 'archiveById']);
-    Route::get('/restaure/{date}', [DetteArchiveController::class, 'restaureDataFromOnlineByDate']);
-    Route::get('/restaure-one/{id}', [DetteArchiveController::class, 'restaureDataFromOnlineById']);
-    Route::get('/restaure/dette/client/{id}', [DetteArchiveController::class, 'restaureClientDebtByClientId']);
+    if(env('DB_ARCHIVE') == 'mongo'){
+        Route::get('/dettes/archive', [DetteArchiveWithMongoController::class, 'archiveDette']);
+        Route::get('/archive/clients/{id}/dettes', [DetteArchiveWithMongoController::class, 'archiveClientDebts']);
+        Route::get('/archive/dettes/{id}', [DetteArchiveWithMongoController::class, 'archiveById']);
+        Route::get('/restaure/{date}', [DetteArchiveWithMongoController::class, 'restaureDataFromOnlineByDate']);
+        Route::get('/restaure/dette/{id}', [DetteArchiveWithMongoController::class, 'restaureDataFromOnlineById']);
+        Route::get('/restaure/dette/client/{id}', [DetteArchiveWithMongoController::class, 'restaureClientDebtByClientId']);
+    }else if(env('DB_ARCHIVE') == 'firebase'){
+        Route::get('/dettes/archive', [DetteArchiveWithFireBaseController::class, 'archiveDette']);
+        Route::get('/archive/clients/{id}/dettes', [DetteArchiveWithFireBaseController::class, 'archiveClientDebts']);
+        Route::get('/archive/dettes/{id}', [DetteArchiveWithFireBaseController::class, 'archiveById']);
+        Route::get('/restaure/{date}', [DetteArchiveWithFireBaseController::class, 'restaureDataFromOnlineByDate']);
+        Route::get('/restaure/dette/{id}', [DetteArchiveWithFireBaseController::class, 'restaureDataFromOnlineById']);
+        Route::get('/restaure/dette/client/{id}', [DetteArchiveWithFireBaseController::class, 'restaureClientDebtByClientId']);
+    }
+    
 });
 
 //protected route only shopkeeper cas access

@@ -446,7 +446,7 @@
                     "StoreClient"
                 ],
                 "summary": "Store Client",
-                "description": "Création d'un client avec la possibilité de lui créer un compte",
+                "description": "Création d'un client avec la possibilité de lui créer un compte utilisateur",
                 "operationId": "StoreClient",
                 "requestBody": {
                     "required": true,
@@ -455,60 +455,61 @@
                             "schema": {
                                 "required": [
                                     "surname",
-                                    "telephone"
+                                    "telephone",
+                                    "category_client[id]"
                                 ],
                                 "properties": {
                                     "surname": {
                                         "type": "string",
-                                        "example": "bobou"
+                                        "example": "wane123"
                                     },
                                     "telephone": {
                                         "type": "string",
-                                        "example": "761434522"
+                                        "example": "777669595"
                                     },
                                     "adresse": {
                                         "type": "string",
-                                        "example": "namek"
+                                        "example": "academy"
                                     },
-                                    "user": {
-                                        "properties": {
-                                            "nom": {
-                                                "type": "string",
-                                                "example": "Mahmoud"
-                                            },
-                                            "prenom": {
-                                                "type": "string",
-                                                "example": "Mahmoud"
-                                            },
-                                            "login": {
-                                                "type": "string",
-                                                "example": "Mahmoudine"
-                                            },
-                                            "photo": {
-                                                "type": "string",
-                                                "example": "https://images.pexels.com/photos/633432/pexels-photo-633432.jpeg?auto=compress&cs=tinysrgb&w=600"
-                                            },
-                                            "password": {
-                                                "type": "string",
-                                                "format": "password",
-                                                "example": "Passer@123"
-                                            },
-                                            "password_confirmation": {
-                                                "type": "string",
-                                                "format": "password",
-                                                "example": "Passer@123"
-                                            },
-                                            "role": {
-                                                "properties": {
-                                                    "id": {
-                                                        "type": "integer",
-                                                        "example": "3"
-                                                    }
-                                                },
-                                                "type": "object"
-                                            }
-                                        },
-                                        "type": "object"
+                                    "category_client[id]": {
+                                        "type": "integer",
+                                        "example": "2"
+                                    },
+                                    "max_montant": {
+                                        "description": "Requis pour les clients de catégorie Silver (id=2)",
+                                        "type": "number",
+                                        "example": 10000
+                                    },
+                                    "user[nom]": {
+                                        "type": "string",
+                                        "example": "Mahmoud"
+                                    },
+                                    "user[prenom]": {
+                                        "type": "string",
+                                        "example": "Mahmoudine"
+                                    },
+                                    "user[login]": {
+                                        "type": "string",
+                                        "example": "mhd123"
+                                    },
+                                    "user[photo]": {
+                                        "description": "Upload de la photo de l'utilisateur",
+                                        "type": "string",
+                                        "format": "base64"
+                                    },
+                                    "user[password]": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "Passer@123"
+                                    },
+                                    "user[password_confirmation]": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "Passer@123"
+                                    },
+                                    "user[role][id]": {
+                                        "type": "integer",
+                                        "example": "3"
                                     }
                                 },
                                 "type": "object"
@@ -518,20 +519,35 @@
                             "schema": {
                                 "required": [
                                     "surname",
-                                    "telephone"
+                                    "telephone",
+                                    "category_client"
                                 ],
                                 "properties": {
                                     "surname": {
                                         "type": "string",
-                                        "example": "bobou"
+                                        "example": "wane123"
                                     },
                                     "telephone": {
                                         "type": "string",
-                                        "example": "761434522"
+                                        "example": "777669595"
                                     },
                                     "adresse": {
                                         "type": "string",
-                                        "example": "namek"
+                                        "example": "academy"
+                                    },
+                                    "category_client": {
+                                        "properties": {
+                                            "id": {
+                                                "type": "integer",
+                                                "example": 2
+                                            }
+                                        },
+                                        "type": "object"
+                                    },
+                                    "max_montant": {
+                                        "description": "Requis pour les clients de catégorie Silver (id=2)",
+                                        "type": "number",
+                                        "example": 10000
                                     },
                                     "user": {
                                         "properties": {
@@ -549,7 +565,7 @@
                                             },
                                             "photo": {
                                                 "type": "string",
-                                                "example": "https://images.pexels.com/photos/633432/pexels-photo-633432.jpeg?auto=compress&cs=tinysrgb&w=600"
+                                                "format": "base64"
                                             },
                                             "password": {
                                                 "type": "string",
@@ -565,7 +581,7 @@
                                                 "properties": {
                                                     "id": {
                                                         "type": "integer",
-                                                        "example": "3"
+                                                        "example": 3
                                                     }
                                                 },
                                                 "type": "object"
@@ -759,6 +775,332 @@
                         "schema": {
                             "type": "integer",
                             "example": 17
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Opération reussie",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "404": {
+                        "description": "Resource Not Found"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/dettes/archive": {
+            "get": {
+                "tags": [
+                    "AllArchiveDebtsOptionalFilters"
+                ],
+                "summary": "Get all archive debts with optional filters",
+                "description": "Récupération de toutes les dettes archivées avec possibilité de filtrer les dettes par telephone ou par date",
+                "operationId": "GetAllAllArchiveDebtWithOptionalFilters",
+                "parameters": [
+                    {
+                        "name": "telephone",
+                        "in": "query",
+                        "description": "Filterer les dettes archichées par telephone",
+                        "required": false
+                    },
+                    {
+                        "name": "date",
+                        "in": "query",
+                        "description": "Filterer les dettes archichées par date",
+                        "required": false
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Opération reussie",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "404": {
+                        "description": "Resource Not Found"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/archive/clients/{id}/dettes": {
+            "get": {
+                "tags": [
+                    "GetArchiveDebtsByClientId"
+                ],
+                "summary": "Get Archive Debts By Client ID",
+                "description": "Récupération de toutes les archivées du client par son identifiant",
+                "operationId": "GetAllArchiveClientDebtsByClientId",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Récupérer toutes les dettes archivées du client par son ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 17
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Opération reussie",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "404": {
+                        "description": "Resource Not Found"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/archive/dettes/{id}": {
+            "get": {
+                "tags": [
+                    "GetArchiveDebtById"
+                ],
+                "summary": "Get Archive Debt By ID",
+                "description": "Récupération d'une dette par son ID",
+                "operationId": "GetArchiveDebtsById",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Récupérer la dette archivée par son ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 17
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Opération reussie",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "404": {
+                        "description": "Resource Not Found"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/restaure/{date}": {
+            "get": {
+                "tags": [
+                    "RestaureArchiveDebtByGivenDate"
+                ],
+                "summary": "Restaure Archive Debt By Given Date",
+                "description": "Restauration d'une dette à travers une date passée en paramètre",
+                "operationId": "RestaureArchiveDebtByGivenDate",
+                "parameters": [
+                    {
+                        "name": "date",
+                        "in": "path",
+                        "description": "Restaurer des dettes archivées à travers une date",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "2022_01_01"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Opération reussie",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "404": {
+                        "description": "Resource Not Found"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/restaure/dette/{id}": {
+            "get": {
+                "tags": [
+                    "RestaureArchiveDebtByGivenId"
+                ],
+                "summary": "Restaure Archive Debt By Given ID",
+                "description": "Restauration d'une dette à travers son ID",
+                "operationId": "RestaureArchiveDebtByGivenId",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Restaurer une dette archivée à travers son ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": "4"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Opération reussie",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "404": {
+                        "description": "Resource Not Found"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/dette/client/{id}": {
+            "get": {
+                "tags": [
+                    "RestaureAllClientArchiveDebtsByClientID"
+                ],
+                "summary": "Restaure all client Archive Debt By client ID",
+                "description": "Restaurer toutes les dettes d'un client à travers son ID",
+                "operationId": "RestaureAllClientArchiveDebtsByClientID",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Restaurer toutes les dettes archivées à travers son ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": "4"
                         }
                     }
                 ],
@@ -1063,6 +1405,30 @@
         {
             "name": "GetClientByIdWithUserAccount",
             "description": "GetClientByIdWithUserAccount"
+        },
+        {
+            "name": "AllArchiveDebtsOptionalFilters",
+            "description": "AllArchiveDebtsOptionalFilters"
+        },
+        {
+            "name": "GetArchiveDebtsByClientId",
+            "description": "GetArchiveDebtsByClientId"
+        },
+        {
+            "name": "GetArchiveDebtById",
+            "description": "GetArchiveDebtById"
+        },
+        {
+            "name": "RestaureArchiveDebtByGivenDate",
+            "description": "RestaureArchiveDebtByGivenDate"
+        },
+        {
+            "name": "RestaureArchiveDebtByGivenId",
+            "description": "RestaureArchiveDebtByGivenId"
+        },
+        {
+            "name": "RestaureAllClientArchiveDebtsByClientID",
+            "description": "RestaureAllClientArchiveDebtsByClientID"
         },
         {
             "name": "StoreUser",

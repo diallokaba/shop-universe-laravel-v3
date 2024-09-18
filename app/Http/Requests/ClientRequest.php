@@ -23,26 +23,26 @@ class ClientRequest extends FormRequest
      *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
-    public function rules(): array
-    {
+    public function rules(): array{
         $rules = [
-            'surname' => ['required', 'string', 'max:255','unique:clients,surname'],
+            'surname' => ['required', 'string', 'max:255', 'unique:clients,surname'],
             'telephone' => ['required', 'unique:clients,telephone', new TelephoneRule()],
-            'category_client.id' => ['required_with:id','integer', 'exists:category_clients,id'],
-
-             // Validation conditionnelle si un utilisateur doit être créé
-            'user' => ['sometimes', 'array'],
-            'user.nom' => ['required_with:user', 'string', 'min:2', 'max:255'],
-            'user.prenom' => ['required_with:user', 'string', 'min:2', 'max:255'],
-            'user.login' => ['required_with:user', 'string', 'min:4', 'max:255', 'unique:users,login'],
-            'user.photo' => ['required_with:user', 'image', 'mimes:jpeg,png,jpg,gif', 'max:40'], // Ajoutez une validation 'url' si nécessaire
-            'user.password' => ['required_with:user', 'confirmed', new CustomPasswordRule()],
-            'user.password_confirmation' => ['required_with:user', 'string'],
-
+            'category_client.id' => ['required_with:id', 'integer', 'exists:category_clients,id'],
         ];
+
+        // Vérifier si l'objet 'user' a au moins une clé non vide
+        if ($this->filled('user.nom') || $this->filled('user.prenom') || $this->filled('user.login') || $this->filled('user.photo') || $this->filled('user.password')) {
+            $rules['user.nom'] = ['required', 'string', 'min:2', 'max:255'];
+            $rules['user.prenom'] = ['required', 'string', 'min:2', 'max:255'];
+            $rules['user.login'] = ['required', 'string', 'min:4', 'max:255', 'unique:users,login'];
+            $rules['user.photo'] = ['required', 'image', 'mimes:jpeg,png,jpg,gif', 'max:40'];
+            $rules['user.password'] = ['required', 'confirmed', new CustomPasswordRule()];
+            $rules['user.password_confirmation'] = ['required', 'string'];
+        }
 
         return $rules;
     }
+
 
     public function messages(): array
     {
@@ -54,6 +54,7 @@ class ClientRequest extends FormRequest
             'cateogry_client.id.exists' => "Cette catégorie de client n'existe pas.",
             'cateogry_client.id.required_with' => "La category du client est obligatoire.",
 
+            'user' => ['sometimes', 'array'],
             'user.nom.required_with' => 'Le nom est obligatoire',
             'user.nom.min' => 'Le nom doit avoir au moins 2 caractères.',
             'user.prenom.required_with' => 'Le prénom est obligatoire',

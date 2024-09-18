@@ -22,7 +22,7 @@ class ClientObserver
     {
         $data = request()->all();
         $user = null;
-        if(isset($data['user'])) {
+        if(!empty($data['user']['nom']) || !empty($data['user']['prenom']) || !empty($data['user']['login']) || !empty($data['user']['photo']) || !empty($data['user']['password'])) {
             $validator = $this->validateData($data['user']);
 
             if ($validator->fails()) {
@@ -67,14 +67,20 @@ class ClientObserver
 
     public function validateData($user)
     {
-        return Validator::make($user, [
-            'nom' => 'required|string|min:2|max:255',
-            'prenom' => 'required|string|min:2|max:255',
-            'login' => 'required|string|min:4|max:255|unique:users,login',
-            'photo' => 'image', 'mimes:jpeg,png,jpg,gif', 'max:40',
-            'password' => ['confirmed', new CustomPasswordRule()],
-            'password_confirmation' => 'required',
-            'role.id' => ['required_with:id', 'integer', 'exists:roles,id'],
-        ]);
+        // Vérifier si au moins une des clés de 'user' est renseignée
+        if (!empty($user['nom']) || !empty($user['prenom']) || !empty($user['login']) || !empty($user['photo']) || !empty($user['password'])) {
+            return Validator::make($user, [
+                'nom' => 'required|string|min:2|max:255',
+                'prenom' => 'required|string|min:2|max:255',
+                'login' => 'required|string|min:4|max:255|unique:users,login',
+                'photo' => 'image|mimes:jpeg,png,jpg,gif|max:40',
+                'password' => ['confirmed', new CustomPasswordRule()],
+                'password_confirmation' => 'required',
+                'role.id' => ['required_with:id', 'integer', 'exists:roles,id'],
+            ]);
+        }
+
+        // Retourner un validateur vide si aucune clé n'est renseignée
+        return Validator::make([], []);
     }
 }

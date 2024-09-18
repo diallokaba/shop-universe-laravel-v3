@@ -20,74 +20,6 @@ class ClientController extends Controller
 {
     use RestResponseTrait;
 
-   /**
-     * @OA\Post(
-     *     path="/api/v1/clients",
-     *     operationId="StoreClient",
-     *     tags={"StoreClient"},
-     *     summary="Store Client",
-     *     description="Création d'un client avec la possibilité de lui créer un compte",
-     *     security={{"bearerAuth":{}}},
-     *     @OA\RequestBody(
-     *         required=true,
-     *         @OA\MediaType(
-     *             mediaType="multipart/form-data",
-     *             @OA\Schema(
-     *                 type="object",
-     *                 required={"surname", "telephone"},
-     *                 @OA\Property(property="surname", type="string", example="bobou"),
-     *                 @OA\Property(property="telephone", type="string", example="761434522"),
-     *                 @OA\Property(property="adresse", type="string", example="namek"),
-     *                 @OA\Property(property="user", type="object",
-     *                     @OA\Property(property="nom", type="string", example="Mahmoud"),
-     *                     @OA\Property(property="prenom", type="string", example="Mahmoud"),
-     *                     @OA\Property(property="login", type="string", example="Mahmoudine"),
-     *                     @OA\Property(property="photo", type="string", example="https://images.pexels.com/photos/633432/pexels-photo-633432.jpeg?auto=compress&cs=tinysrgb&w=600"),
-     *                     @OA\Property(property="password", type="string", format="password", example="Passer@123"),
-     *                     @OA\Property(property="password_confirmation", type="string", format="password", example="Passer@123"),
-     *                     @OA\Property(property="role", type="object",
-     *                         @OA\Property(property="id", type="integer", example="3")
-     *                     )
-     *                 )
-     *             )
-     *         ),
-     *         @OA\MediaType(
-     *             mediaType="application/json",
-     *             @OA\Schema(
-     *                 type="object",
-     *                 required={"surname", "telephone"},
-     *                 @OA\Property(property="surname", type="string", example="bobou"),
-     *                 @OA\Property(property="telephone", type="string", example="761434522"),
-     *                 @OA\Property(property="adresse", type="string", example="namek"),
-     *                 @OA\Property(property="user", type="object",
-     *                     @OA\Property(property="nom", type="string", example="Mahmoud"),
-     *                     @OA\Property(property="prenom", type="string", example="Mahmoud"),
-     *                     @OA\Property(property="login", type="string", example="Mahmoudine"),
-     *                     @OA\Property(property="photo", type="string", example="https://images.pexels.com/photos/633432/pexels-photo-633432.jpeg?auto=compress&cs=tinysrgb&w=600"),
-     *                     @OA\Property(property="password", type="string", format="password", example="Passer@123"),
-     *                     @OA\Property(property="password_confirmation", type="string", format="password", example="Passer@123"),
-     *                     @OA\Property(property="role", type="object",
-     *                         @OA\Property(property="id", type="integer", example="3")
-     *                     )
-     *                 )
-     *             )
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=201,
-     *         description="Client créé avec succès",
-     *         @OA\JsonContent()
-     *     ),
-     *     @OA\Response(
-     *         response=422,
-     *         description="Unprocessable Entity",
-     *         @OA\JsonContent()
-     *     ),
-     *     @OA\Response(response=400, description="Bad request"),
-     *     @OA\Response(response=404, description="Resource Not Found"),
-     *     @OA\Response(response=500, description="Internal server error")
-     * )
-     */
     /*public function store2(ClientRequest $request){
         try {
             DB::beginTransaction();
@@ -128,12 +60,81 @@ class ClientController extends Controller
         }
     }*/
 
+    /**
+     * @OA\Post(
+     *     path="/api/v1/clients",
+     *     operationId="StoreClient",
+     *     tags={"StoreClient"},
+     *     summary="Store Client",
+     *     description="Création d'un client avec la possibilité de lui créer un compte utilisateur",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\MediaType(
+     *             mediaType="multipart/form-data",
+     *             @OA\Schema(
+     *                 type="object",
+     *                 required={"surname", "telephone", "category_client[id]"},
+     *                 @OA\Property(property="surname", type="string", example="wane123"),
+     *                 @OA\Property(property="telephone", type="string", example="777669595"),
+     *                 @OA\Property(property="adresse", type="string", example="academy"),
+     *                 @OA\Property(property="category_client[id]", type="integer", example="2"),
+     *                 @OA\Property(property="max_montant", type="number", example=10000, description="Requis pour les clients de catégorie Silver (id=2)"),
+     *                 @OA\Property(property="user[nom]", type="string", example="Mahmoud"),
+     *                 @OA\Property(property="user[prenom]", type="string", example="Mahmoudine"),
+     *                 @OA\Property(property="user[login]", type="string", example="mhd123"),
+     *                 @OA\Property(property="user[photo]", type="string", format="base64", description="Upload de la photo de l'utilisateur"),
+     *                 @OA\Property(property="user[password]", type="string", format="password", example="Passer@123"),
+     *                 @OA\Property(property="user[password_confirmation]", type="string", format="password", example="Passer@123"),
+     *                 @OA\Property(property="user[role][id]", type="integer", example="3"),
+     *             )
+     *         ),
+     *         @OA\MediaType(
+     *             mediaType="application/json",
+     *             @OA\Schema(
+     *                 type="object",
+     *                 required={"surname", "telephone", "category_client"},
+     *                 @OA\Property(property="surname", type="string", example="wane123"),
+     *                 @OA\Property(property="telephone", type="string", example="777669595"),
+     *                 @OA\Property(property="adresse", type="string", example="academy"),
+     *                 @OA\Property(property="category_client", type="object",
+     *                     @OA\Property(property="id", type="integer", example=2)
+     *                 ),
+     *                 @OA\Property(property="max_montant", type="number", example=10000, description="Requis pour les clients de catégorie Silver (id=2)"),
+     *                 @OA\Property(property="user", type="object",
+     *                     @OA\Property(property="nom", type="string", example="Mahmoud"),
+     *                     @OA\Property(property="prenom", type="string", example="Mahmoud"),
+     *                     @OA\Property(property="login", type="string", example="Mahmoudine"),
+     *                     @OA\Property(property="photo", type="string", format="base64"),
+     *                     @OA\Property(property="password", type="string", format="password", example="Passer@123"),
+     *                     @OA\Property(property="password_confirmation", type="string", format="password", example="Passer@123"),
+     *                     @OA\Property(property="role", type="object",
+     *                         @OA\Property(property="id", type="integer", example=3)
+     *                     )
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Client créé avec succès",
+     *         @OA\JsonContent()
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Unprocessable Entity",
+     *         @OA\JsonContent()
+     *     ),
+     *     @OA\Response(response=400, description="Bad request"),
+     *     @OA\Response(response=404, description="Resource Not Found"),
+     *     @OA\Response(response=500, description="Internal server error")
+     * )
+     */
     public function store(ClientRequest $request){
-      
-        $clientRequest = $request->only('surname','adresse','telephone', 'user', 'category_client');
+        $clientRequest = $request->only('surname','adresse','telephone', 'max_montant', 'user', 'category_client');
+        
         $client = clientService::create($clientRequest);
         return $client;
-        //return $this->sendResponse(new ClientResource($client), StatusResponseEnum::SUCCESS, 'Client créé avec succès', 201);
     }
 
     public function all(){

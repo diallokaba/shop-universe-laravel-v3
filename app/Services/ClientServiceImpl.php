@@ -32,7 +32,6 @@ class ClientServiceImpl implements ClientServiceInterface
     }
 
     public function create(array $data){
-
         return DB::transaction(function () use ($data) {  
             $idCategoryClient = $data['category_client']['id'];
             $maxMontant = null;
