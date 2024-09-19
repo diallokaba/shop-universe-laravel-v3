@@ -447,7 +447,7 @@ class DetteArchiveWithMongoController extends Controller
 
     /**
      * @OA\Get(
-     *     path="/api/v1/dette/client/{id}",
+     *     path="/api/v1/restaure/dette/client/{id}",
      *     operationId="RestaureAllClientArchiveDebtsByClientID",
      *     tags={"RestaureAllClientArchiveDebtsByClientID"},
      *     summary="Restaure all client Archive Debt By client ID",

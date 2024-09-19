@@ -27,8 +27,10 @@ class SendNotificationToShopKeeperForDemande implements ShouldQueue
      */
     public function handle(): void
     {
-        $boutiquiers = Client::with('user')->where('role_id', 2)->get();
-        $message = "Une demande vient d'être soumise";
+        $boutiquiers = Client::with('user')->whereHas('user', function($query) {
+            $query->where('role_id', 2);
+        })->get();
+        $message = "Une demande de dette vient d'être soumise";
         foreach ($boutiquiers as $boutiquier) {
             $boutiquier->notify(new DemandeNotification($message));
         }

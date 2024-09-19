@@ -29,7 +29,6 @@ class DemandeServiceImpl implements DemandeServiceInterface{
             
             if($client->category_client_id == 2 && $client->max_montant !=null){// Silver
                 $totalDebts = $this->calculateTotalDebts($client);
-
                 if($totalDebts >= $client->max_montant){
                     throw new Exception("Vous ne pouvez pas faire de demande dette car votre montant maximum de dette est atteint");
                 }

@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use App\Models\Client;
+use App\Models\Dette;
 use App\Models\Paiement;
 use App\Repositories\ArticleRepositoryInterface;
 use App\Repositories\DetteRepositoryInterface;
@@ -50,6 +52,26 @@ class DetteServiceImpl implements DetteServiceInterface{
             $montantDette = 0;
             $clientId = $data["client"]["id"];
 
+            $client = Client::find($clientId);
+            if($client->category_client_id == 3){ // Bronze
+
+                $dette = Dette::where('client_id', $clientId)
+                ->where('statut', 'nonsolde')
+                ->exists();
+
+                if($dette){
+                    throw new Exception("Votre profil ne vous permet pas d'avoir deux dettes non soldées.");
+                }
+            }
+
+            if($client->category_client_id == 2 && $client->max_montant !=null){// Silver
+                $totalDebts = $this->calculateTotalDebts($client);
+
+                if($totalDebts >= $client->max_montant){
+                    throw new Exception("Vous ne pouvez pas faire de demande dette car votre montant maximum de dette est atteint");
+                }
+            }
+
             $dette = $this->detteRepository->create(["client_id" => $clientId, "montant" => $montantDette, "echeance" => $data["echeance"] ?? null]);
             if (!$dette) {
                 throw new Exception('Erreur lors de la création de la dette. La dette n\'a pas pu être créée.');
@@ -81,6 +103,14 @@ class DetteServiceImpl implements DetteServiceInterface{
                 throw new Exception("Impossible de creer la dette car aucun article n'a pu etre ajouter");
             }
 
+            if($client->category_client_id == 2 && $client->max_montant !=null){// Silver
+                $totalDebts = $this->calculateTotalDebts($client);
+                $totalDebts += $montantDette;
+                if($totalDebts >= $client->max_montant){
+                    throw new Exception("Vous ne pouvez pas faire de demande dette car votre montant maximum de dette est atteint");
+                }
+            }
+
             $dette->montant = $montantDette;
             $dette->save();
 
@@ -101,6 +131,17 @@ class DetteServiceImpl implements DetteServiceInterface{
                 }
             }
 
+            if($client->category_client_id == 2 && $client->max_montant !=null){// Silver
+                $totalDebts = $this->calculateTotalDebts($client);
+                if($paiement){
+                    $montantDette -= $paiement->montant;
+                }
+                $totalDebts += $montantDette;
+                if($totalDebts >= $client->max_montant){
+                    throw new Exception("Vous ne pouvez pas faire de demande dette car votre montant maximum de dette est atteint");
+                }
+            }
+
             DB::commit();
             
             return ["dette" => $dette, "success" => $articleSuccess, "failed" => $articleFailed, "paiement" => $paiement];
@@ -108,6 +149,19 @@ class DetteServiceImpl implements DetteServiceInterface{
             DB::rollBack();
             throw new Exception('Erreur lors de la creation de la dette : ' . $e->getMessage());
         }
+    }
+
+    private function calculateTotalDebts($client){
+        $dettes = Dette::with('paiements')
+                    ->where('client_id', $client->id)
+                    ->where('statut', 'nonsolde')
+                    ->get();
+
+        $totalDebts = $dettes->sum(function ($dette) {
+            return $dette->montant - $dette->paiements->sum('montant');
+        });
+
+        return $totalDebts;
     }
 
     public function update(array $data, $id)
@@ -182,7 +236,8 @@ class DetteServiceImpl implements DetteServiceInterface{
         if(!is_numeric($id)){
             throw new Exception('L\'id doit être un nombre entier');
         }
-        $id = (int)$id;
-        return $this->detteRepository->debtsWithPayments($id);
+        //$id = (int)$id;
+        $dettes = $this->detteRepository->debtsWithPayments($id);
+        return $dettes;
     }
 }

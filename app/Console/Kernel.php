@@ -37,8 +37,8 @@ class Kernel extends ConsoleKernel
         
         //$schedule->job(new ArchiveDetteJobWithFireBase)->everyFiveSeconds();
         //$schedule->job(new ArchiveDetteJobWithMongo)->everyFiveSeconds();
-        if($archiveService == 'mongodb') {
-            $schedule->job(new ArchiveDetteJobWithMongo)->everyFiveSeconds();
+        if($archiveService == 'mongo') {
+            //$schedule->job(new ArchiveDetteJobWithMongo)->everyFiveSeconds();
             //$schedule->job(new ArchiveDetteJobWithMongo)->daily();
         }elseif($archiveService == 'firebase') {
             //$schedule->job(new ArchiveDetteJobWithFireBase)->everyFiveSeconds();

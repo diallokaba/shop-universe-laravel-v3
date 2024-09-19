@@ -812,6 +812,164 @@
                 ]
             }
         },
+        "/api/v1/demandes": {
+            "post": {
+                "tags": [
+                    "DemandesDeDette"
+                ],
+                "summary": "Créer une nouvelle demande de dette pour un client",
+                "description": "Permet à un client authentifié de créer une demande de dette en fournissant des détails sur les articles demandés. Le montant total est calculé en fonction des articles et de leurs quantités. Des restrictions sont appliquées selon la catégorie du client (Silver, Bronze).",
+                "operationId": "CreateDetteDemande",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "details_article_demande"
+                                ],
+                                "properties": {
+                                    "details_article_demande": {
+                                        "type": "array",
+                                        "items": {
+                                            "properties": {
+                                                "articleId": {
+                                                    "description": "L'ID de l'article à ajouter à la demande.",
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "qteDemande": {
+                                                    "description": "La quantité demandée de cet article.",
+                                                    "type": "integer",
+                                                    "example": 2
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Demande créée avec succès.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "id": {
+                                            "description": "L'ID de la demande créée.",
+                                            "type": "integer",
+                                            "example": 10
+                                        },
+                                        "client_id": {
+                                            "description": "L'ID du client ayant effectué la demande.",
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "montant": {
+                                            "description": "Le montant total de la demande.",
+                                            "type": "number",
+                                            "format": "float",
+                                            "example": 2500
+                                        },
+                                        "articles": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "articleId": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "qteDemande": {
+                                                        "type": "integer",
+                                                        "example": 2
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Requête invalide - Le client ou les détails de la demande sont incorrects.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Client non trouvé."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Accès refusé - Les restrictions du client empêchent la création de la demande.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Vous ne pouvez pas faire de demande dette car votre montant maximum de dette est atteint."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Aucun article ajouté - La demande ne peut pas être créée.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Impossible de creer cette demande car aucun article n'a pu etre ajouter."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Erreur serveur interne lors de la création de la demande.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Erreur lors de la creation de la demande."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/v1/dettes/archive": {
             "get": {
                 "tags": [
@@ -1084,7 +1242,7 @@
                 ]
             }
         },
-        "/api/v1/dette/client/{id}": {
+        "/api/v1/restaure/dette/client/{id}": {
             "get": {
                 "tags": [
                     "RestaureAllClientArchiveDebtsByClientID"
@@ -1138,40 +1296,188 @@
                 ]
             }
         },
-        "/api/v1/demandes": {
+        "/api/v1/dettes": {
+            "get": {
+                "tags": [
+                    "Dettes"
+                ],
+                "summary": "Obtenir une liste de dettes filtrée par statut",
+                "description": "Retourne une liste de dettes, avec la possibilité de filtrer par statut (solde ou nonsolde). Si aucun statut n'est spécifié, retourne toutes les dettes.",
+                "operationId": "getDettes",
+                "parameters": [
+                    {
+                        "name": "statut",
+                        "in": "query",
+                        "description": "Filtrer les dettes par statut. Peut être 'solde' ou 'nonsolde'.",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "solde"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Liste des dettes récupérées avec succès.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "id": {
+                                                "type": "integer",
+                                                "example": 10
+                                            },
+                                            "client_id": {
+                                                "type": "integer",
+                                                "example": 1
+                                            },
+                                            "montant": {
+                                                "type": "number",
+                                                "format": "float",
+                                                "example": 1500
+                                            },
+                                            "statut": {
+                                                "description": "Le statut de la dette.",
+                                                "type": "string",
+                                                "example": "solde"
+                                            },
+                                            "client": {
+                                                "description": "Informations sur le client associé à la dette.",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "nom": {
+                                                        "type": "string",
+                                                        "example": "John Doe"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Requête invalide - Paramètres de requête incorrects ou manquants.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Paramètre 'statut' invalide."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Erreur serveur interne lors de la récupération des dettes.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Erreur lors de l'affichage des dettes : Erreur spécifique."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
             "post": {
                 "tags": [
-                    "DemandesDeDette"
+                    "Dettes"
                 ],
-                "summary": "Créer une nouvelle demande de dette pour un client",
-                "description": "Permet à un client authentifié de créer une demande de dette en fournissant des détails sur les articles demandés. Le montant total est calculé en fonction des articles et de leurs quantités. Des restrictions sont appliquées selon la catégorie du client (Silver, Bronze).",
-                "operationId": "CreateDetteDemande",
+                "summary": "Créer une nouvelle dette pour un client",
+                "description": "Permet de créer une nouvelle dette pour un client spécifié, incluant les articles de la dette et un paiement initial optionnel.",
+                "operationId": "createDette",
                 "requestBody": {
                     "required": true,
                     "content": {
                         "application/json": {
                             "schema": {
                                 "required": [
-                                    "details_article_demande"
+                                    "client",
+                                    "details_dette"
                                 ],
                                 "properties": {
-                                    "details_article_demande": {
+                                    "client": {
+                                        "required": [
+                                            "id"
+                                        ],
+                                        "properties": {
+                                            "id": {
+                                                "description": "L'ID du client lié à la dette.",
+                                                "type": "integer",
+                                                "example": 1
+                                            }
+                                        },
+                                        "type": "object"
+                                    },
+                                    "details_dette": {
                                         "type": "array",
                                         "items": {
+                                            "required": [
+                                                "articleId",
+                                                "qteVente",
+                                                "prixVente"
+                                            ],
                                             "properties": {
                                                 "articleId": {
-                                                    "description": "L'ID de l'article à ajouter à la demande.",
-                                                    "type": "integer",
-                                                    "example": 1
-                                                },
-                                                "qteDemande": {
-                                                    "description": "La quantité demandée de cet article.",
+                                                    "description": "L'ID de l'article.",
                                                     "type": "integer",
                                                     "example": 2
+                                                },
+                                                "qteVente": {
+                                                    "description": "La quantité vendue.",
+                                                    "type": "integer",
+                                                    "example": 3
+                                                },
+                                                "prixVente": {
+                                                    "description": "Le prix de vente de l'article.",
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 1500.5
                                                 }
                                             },
                                             "type": "object"
                                         }
+                                    },
+                                    "echeance": {
+                                        "description": "La date d'échéance de la dette (optionnelle).",
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2024-12-31"
+                                    },
+                                    "paiement": {
+                                        "properties": {
+                                            "montant": {
+                                                "description": "Le montant du premier paiement (optionnel).",
+                                                "type": "number",
+                                                "format": "float",
+                                                "example": 500
+                                            }
+                                        },
+                                        "type": "object"
                                     }
                                 },
                                 "type": "object"
@@ -1181,38 +1487,329 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "Demande créée avec succès.",
+                        "description": "Dette créée avec succès.",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "properties": {
-                                        "id": {
-                                            "description": "L'ID de la demande créée.",
-                                            "type": "integer",
-                                            "example": 10
+                                        "dette": {
+                                            "description": "Informations sur la dette créée.",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 10
+                                                },
+                                                "client_id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "montant": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 4500
+                                                }
+                                            },
+                                            "type": "object"
                                         },
-                                        "client_id": {
-                                            "description": "L'ID du client ayant effectué la demande.",
-                                            "type": "integer",
-                                            "example": 1
+                                        "success": {
+                                            "type": "array",
+                                            "items": {
+                                                "description": "ID des articles ajoutés avec succès.",
+                                                "type": "integer",
+                                                "example": 2
+                                            }
                                         },
-                                        "montant": {
-                                            "description": "Le montant total de la demande.",
-                                            "type": "number",
-                                            "format": "float",
-                                            "example": 2500
+                                        "failed": {
+                                            "type": "array",
+                                            "items": {
+                                                "description": "ID des articles qui n'ont pas pu être ajoutés.",
+                                                "type": "integer",
+                                                "example": 3
+                                            }
                                         },
-                                        "articles": {
+                                        "paiement": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 5
+                                                },
+                                                "dette_id": {
+                                                    "type": "integer",
+                                                    "example": 10
+                                                },
+                                                "montant": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 500
+                                                }
+                                            },
+                                            "type": "object",
+                                            "nullable": true
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Requête invalide - Données de la requête incorrectes ou incomplètes.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Erreur lors de la création de la dette. La dette n'a pas pu être créée."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity - Erreur de logique métier, par exemple un paiement initial supérieur au montant total de la dette.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Le montant du premier paiement doit être inférieur au montant total de la dette."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Erreur serveur interne lors de la création de la dette.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Erreur lors de la création de la dette : Erreur spécifique."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/dettes/{id}/paiments": {
+            "get": {
+                "tags": [
+                    "Dettes"
+                ],
+                "summary": "Obtenir les détails d'une dette avec tous les paiements associés",
+                "description": "Retourne les informations sur une dette spécifique ainsi que tous les paiements effectués pour cette dette, en utilisant l'ID de la dette.",
+                "operationId": "getDebtsWithPayments",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "L'ID de la dette pour laquelle récupérer les informations et paiements.",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Détails de la dette et des paiements récupérés avec succès.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "dette": {
+                                            "description": "Informations sur la dette.",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 10
+                                                },
+                                                "client_id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "montant": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 1500
+                                                },
+                                                "statut": {
+                                                    "description": "Le statut de la dette.",
+                                                    "type": "string",
+                                                    "example": "solde"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "paiements": {
                                             "type": "array",
                                             "items": {
                                                 "properties": {
-                                                    "articleId": {
+                                                    "id": {
                                                         "type": "integer",
-                                                        "example": 1
+                                                        "example": 5
                                                     },
-                                                    "qteDemande": {
+                                                    "dette_id": {
                                                         "type": "integer",
-                                                        "example": 2
+                                                        "example": 10
+                                                    },
+                                                    "montant": {
+                                                        "type": "number",
+                                                        "format": "float",
+                                                        "example": 500
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "La dette avec l'ID spécifié n'existe pas.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "La dette avec l'id 10 n'existe pas."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Erreur serveur interne lors de la récupération des informations de la dette.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Erreur lors de la récupération des paiements : Erreur spécifique."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Paiements"
+                ],
+                "summary": "Effectuer un paiement pour une dette",
+                "description": "Permet d'effectuer un paiement pour une dette existante en spécifiant l'ID de la dette et le montant du paiement.",
+                "operationId": "paiement",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "L'ID de la dette à payer.",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "montant"
+                                ],
+                                "properties": {
+                                    "montant": {
+                                        "description": "Le montant du paiement à effectuer.",
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 500
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Paiement effectué avec succès.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "dette": {
+                                            "description": "Informations sur la dette mise à jour.",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 10
+                                                },
+                                                "client_id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "montant": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 1500
+                                                },
+                                                "statut": {
+                                                    "description": "Le statut de la dette.",
+                                                    "type": "string",
+                                                    "example": "solde"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "paiements": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 5
+                                                    },
+                                                    "dette_id": {
+                                                        "type": "integer",
+                                                        "example": 10
+                                                    },
+                                                    "montant": {
+                                                        "type": "number",
+                                                        "format": "float",
+                                                        "example": 500
                                                     }
                                                 },
                                                 "type": "object"
@@ -1225,14 +1822,14 @@
                         }
                     },
                     "400": {
-                        "description": "Requête invalide - Le client ou les détails de la demande sont incorrects.",
+                        "description": "Requête invalide - Données de la requête incorrectes ou incomplètes.",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "properties": {
                                         "message": {
                                             "type": "string",
-                                            "example": "Client non trouvé."
+                                            "example": "La dette avec l'id 10 n'existe pas."
                                         }
                                     },
                                     "type": "object"
@@ -1240,31 +1837,15 @@
                             }
                         }
                     },
-                    "403": {
-                        "description": "Accès refusé - Les restrictions du client empêchent la création de la demande.",
+                    "422": {
+                        "description": "Unprocessable Entity - Erreur de logique métier, par exemple un paiement total dépassant le montant de la dette.",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "properties": {
                                         "message": {
                                             "type": "string",
-                                            "example": "Vous ne pouvez pas faire de demande dette car votre montant maximum de dette est atteint."
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "Aucun article ajouté - La demande ne peut pas être créée.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Impossible de creer cette demande car aucun article n'a pu etre ajouter."
+                                            "example": "Le montant total de paiement est supérieur au montant de la dette."
                                         }
                                     },
                                     "type": "object"
@@ -1273,14 +1854,14 @@
                         }
                     },
                     "500": {
-                        "description": "Erreur serveur interne lors de la création de la demande.",
+                        "description": "Erreur serveur interne lors de l'exécution du paiement.",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "properties": {
                                         "message": {
                                             "type": "string",
-                                            "example": "Erreur lors de la creation de la demande."
+                                            "example": "Erreur lors de l'exécution du paiement : Erreur spécifique."
                                         }
                                     },
                                     "type": "object"
@@ -1776,6 +2357,10 @@
             "description": "GetClientByIdWithUserAccount"
         },
         {
+            "name": "DemandesDeDette",
+            "description": "DemandesDeDette"
+        },
+        {
             "name": "AllArchiveDebtsOptionalFilters",
             "description": "AllArchiveDebtsOptionalFilters"
         },
@@ -1800,8 +2385,12 @@
             "description": "RestaureAllClientArchiveDebtsByClientID"
         },
         {
-            "name": "DemandesDeDette",
-            "description": "DemandesDeDette"
+            "name": "Dettes",
+            "description": "Dettes"
+        },
+        {
+            "name": "Paiements",
+            "description": "Paiements"
         },
         {
             "name": "NotificationsForManyClients",
